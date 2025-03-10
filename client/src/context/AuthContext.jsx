@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.get('/api/auth/me');
       setUser(res.data);
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setUser(null);
     }
