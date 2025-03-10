@@ -28,9 +28,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (formData) => {
-    const res = await axios.post('/api/auth/register', formData);
-    setUser(res.data);
-  };
+    try {
+      const { data } = await axios.post('/auth/register', formData);
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+    } catch (err) {
+      localStorage.removeItem('token');
+      throw new Error(err.response?.data?.message || 'Registration failed');
+    }
+  }
 
   const logout = async () => {
     await axios.post('/api/auth/logout');
