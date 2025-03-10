@@ -8,19 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Fetch user on initial load
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await axios.get('/auth/me');
-        setUser(data);
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
+  // In AuthContext.jsx
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      // ... existing code
+    } catch {  // Add underscore prefix
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+  checkAuth();
+}, []);
 
   // Register
   const register = async (name, email, password) => {

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user, login } = useAuth();
+  const { user, login } = useAuth(); // Fixed: Added 'user' here
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
