@@ -31,8 +31,9 @@ export const register = asyncHandler(async (req, res) => {
   });
 });
 
-// Login controller example
-const login = asyncHandler(async (req, res) => {
+// @desc    Auth user & get token
+// @route   POST /api/auth/login
+export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -42,17 +43,25 @@ const login = asyncHandler(async (req, res) => {
     throw new Error('Invalid email or password');
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
-  });
-
   res.json({
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    }
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id),
   });
+});
+
+// @desc    Get user profile
+// @route   GET /api/auth/me
+export const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select('-password');
+  res.json(user);
+});
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie('jwt');
+  res.json({ message: 'Successfully logged out' });
 });
