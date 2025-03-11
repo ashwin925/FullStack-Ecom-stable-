@@ -11,8 +11,6 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cookieParser());
-
 
 // CORS Configuration
 const allowedOrigins = [
@@ -37,13 +35,18 @@ app.use(
   })
 );
 
-app.options('*', cors()); 
+// Handle preflight requests
+app.options('*', cors());
 
+// Middleware
 app.use(express.json());
+app.use(cookieParser());
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
+// Error Handler
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
