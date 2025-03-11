@@ -59,6 +59,17 @@ export const getMe = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+}).json({
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role
+});
 // @desc    Logout user
 // @route   POST /api/auth/logout
 export const logout = asyncHandler(async (req, res) => {

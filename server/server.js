@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import errorHandler from './middleware/error.js';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 connectDB();
@@ -15,6 +16,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
