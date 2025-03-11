@@ -39,6 +39,7 @@ export const register = asyncHandler(async (req, res) => {
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
 export const login = asyncHandler(async (req, res) => {
+  try{
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -60,7 +61,13 @@ export const login = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     role: user.role
-  });
+  });}
+  catch (error) {
+    console.error('Login error:', error.message); // Use error
+    res.status(401).json({ 
+      message: error.message || 'Invalid credentials' 
+    });
+  }
 });
 
 // @desc    Get user profile

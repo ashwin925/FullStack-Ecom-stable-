@@ -20,8 +20,8 @@ const Register = () => {
     try {
       await register(formData);
       navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'Registration failed');
+    } catch (error) {
+      setError(error.message || 'Registration failed');
     }
   };
 

@@ -38,10 +38,6 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-userSchema.index({ email: 1 }, { 
-  unique: true,
-  collation: { locale: 'en', strength: 2 }
-});
 
 const User = mongoose.model('User', userSchema);
 export default User;

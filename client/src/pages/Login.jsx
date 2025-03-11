@@ -11,8 +11,8 @@ const Login = () => {
     setError('');
     try {
       await login(formData);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+    } catch (error) {
+      setError(error.message || 'Login failed'); // Use error
     }
   };
 

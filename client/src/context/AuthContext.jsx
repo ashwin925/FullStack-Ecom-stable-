@@ -13,23 +13,26 @@ export const AuthProvider = ({ children }) => {
 
   const checkUserLoggedIn = async () => {
     try {
-      const { data } = await axios.get('/auth/me'); // Changed endpoint
+      const { data } = await axios.get('/api/auth/me');
       setUser(data);
-    // eslint-disable-next-line no-unused-vars
-    } catch (err) {
+    } catch (error) {
+      console.error('Auth check failed:', error.message); // Use error
       setUser(null);
     }
     setLoading(false);
   };
   
   const login = async (formData) => {
-    const { data } = await axios.post('/auth/login', formData);
-    setUser(data);
+    try {
+      await axios.post('/auth/login', formData);
+      await checkUserLoggedIn(); // Force refresh user state
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Login failed');
+    }
   };
   
   const logout = async () => {
     await axios.post('/auth/logout');
-    localStorage.removeItem('token');
     setUser(null);
   };
   
