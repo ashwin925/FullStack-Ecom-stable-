@@ -4,7 +4,7 @@ import User from '../models/User.js';
 
 const protect = asyncHandler(async (req, res, next) => {
   let token;
-  
+
   // Get token from cookie
   if (req.cookies.token) {
     try {
@@ -14,18 +14,13 @@ const protect = asyncHandler(async (req, res, next) => {
       next();
     } catch (error) {
       console.error(error);
-      res.status(401);
-      throw new Error('Not authorized, token failed');
+      res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "Not authorized, no authentication token"
-    });
+    res.status(401).json({ message: 'Not authorized, no token' });
   }
-  
 });
 
 const admin = (req, res, next) => {
