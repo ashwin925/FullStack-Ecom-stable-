@@ -13,20 +13,26 @@ export const AuthProvider = ({ children }) => {
 
   const checkUserLoggedIn = async () => {
     try {
-      const res = await axios.get('/api/auth/me');
-      setUser(res.data);
+      const { data } = await axios.get('/auth/me'); // Changed endpoint
+      setUser(data);
     // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setUser(null);
     }
     setLoading(false);
   };
-
+  
   const login = async (formData) => {
-    const res = await axios.post('/api/auth/login', formData);
-    setUser(res.data);
+    const { data } = await axios.post('/auth/login', formData);
+    setUser(data);
   };
-
+  
+  const logout = async () => {
+    await axios.post('/auth/logout');
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+  
   const register = async (formData) => {
     try {
       const { data } = await axios.post('/auth/register', formData);
@@ -37,11 +43,6 @@ export const AuthProvider = ({ children }) => {
       throw new Error(err.response?.data?.message || 'Registration failed');
     }
   }
-
-  const logout = async () => {
-    await axios.post('/api/auth/logout');
-    setUser(null);
-  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
