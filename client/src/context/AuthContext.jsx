@@ -38,14 +38,12 @@ export const AuthProvider = ({ children }) => {
   
   const register = async (formData) => {
     try {
-      const { data } = await axios.post('/auth/register', formData);
-      localStorage.setItem('token', data.token);
-      setUser(data.user);
+      await axios.post('/auth/register', formData, { withCredentials: true });
+      await checkUserLoggedIn(); // Force refresh user state
     } catch (err) {
-      localStorage.removeItem('token');
       throw new Error(err.response?.data?.message || 'Registration failed');
     }
-  }
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
