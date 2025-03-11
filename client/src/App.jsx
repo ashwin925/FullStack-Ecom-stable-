@@ -8,10 +8,21 @@ import AdminPanel from './pages/AdminPanel';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
+import { ErrorBoundary } from 'react-error-boundary';
+
+function ErrorFallback({ error }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <Router>
+    <>
+    <ErrorBoundary FallbackComponent={ErrorFallback}></ErrorBoundary><Router>
       <AuthProvider>
         <Header />
         <Routes>
@@ -20,23 +31,20 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
-            element={
-              <PrivateRoute roles={['user', 'seller', 'admin']}>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
+            element={<PrivateRoute roles={['user', 'seller', 'admin']}>
+              <Dashboard />
+            </PrivateRoute>} />
           <Route
             path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPanel />
-              </AdminRoute>
-            }
-          />
+            element={<AdminRoute>
+              <AdminPanel />
+            </AdminRoute>} />
         </Routes>
       </AuthProvider>
     </Router>
+    </ErrorBoundary>
+    </>
+
   );
 }
 
