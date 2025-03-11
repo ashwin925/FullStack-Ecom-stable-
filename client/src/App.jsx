@@ -15,12 +15,13 @@ function App() {
       <AuthProvider>
         <Header />
         <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={
-              <PrivateRoute>
+              <PrivateRoute roles={['user', 'seller', 'admin']}>
                 <Dashboard />
               </PrivateRoute>
             }
