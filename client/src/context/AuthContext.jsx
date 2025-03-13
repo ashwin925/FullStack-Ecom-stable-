@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
   
   const login = async (formData) => {
     try {
-      await axios.post('/auth/login', formData, { withCredentials: true });
+      await axios.post('/api/auth/login', formData, { withCredentials: true });
       await checkUserLoggedIn(); // Force refresh user state
     } catch (err) {
       throw new Error(err.response?.data?.message || 'Login failed');
