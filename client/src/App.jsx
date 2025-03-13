@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
+import SellerPanel from './pages/SellerPanel'; // Add this import
+import UserPanel from './pages/UserPanel'; // Add this import
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
@@ -43,6 +45,22 @@ function App() {
                 <AdminRoute>
                   <AdminPanel />
                 </AdminRoute>
+              }
+            />
+            <Route
+              path="/seller"
+              element={
+                <PrivateRoute roles={['seller', 'admin']}>
+                  <SellerPanel />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/user"
+              element={
+                <PrivateRoute roles={['user']}>
+                  <UserPanel />
+                </PrivateRoute>
               }
             />
           </Routes>

@@ -19,14 +19,15 @@ export const AuthProvider = ({ children }) => {
       console.error('Auth check failed:', error.message);
       setUser(null);
     } finally {
-      setLoading(false); // Ensure loading is set to false
+      setLoading(false);
     }
   };
 
   const login = async (formData) => {
     try {
-      await axios.post('/api/auth/login', formData, { withCredentials: true });
+      const response = await axios.post('/api/auth/login', formData, { withCredentials: true });
       await checkUserLoggedIn(); // Force refresh user state
+      return response.data; // Return the user data
     } catch (err) {
       throw new Error(err.response?.data?.message || 'Login failed');
     }
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout'); // Fixed endpoint
+      await axios.post('/api/auth/logout');
       setUser(null);
     } catch (err) {
       console.error('Logout failed:', err.message);
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      await axios.post('/api/auth/register', formData, { withCredentials: true }); // Fixed endpoint
+      await axios.post('/api/auth/register', formData, { withCredentials: true });
       await checkUserLoggedIn(); // Force refresh user state
     } catch (err) {
       throw new Error(err.response?.data?.message || 'Registration failed');
