@@ -8,11 +8,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(''); // Reset error state
     try {
       await login(formData);
     } catch (error) {
-      setError(error.message || 'Login failed'); // Use error
+      setError(error.message || 'Login failed');
     }
   };
 
