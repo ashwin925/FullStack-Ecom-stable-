@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkUserLoggedIn = async () => {
     try {
-      const { data } = await axios.get('/api/auth/me', { withCredentials: true });
+      const { data } = await axios.get('/api/auth/me');
       setUser(data);
     } catch (error) {
       console.error('Auth check failed:', error.message);
