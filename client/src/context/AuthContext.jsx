@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkUserLoggedIn = async () => {
     try {
-      const { data } = await axios.get('/api/auth/me');
+      const { data } = await axios.get('/api/auth/me', { withCredentials: true });
       setUser(data);
     } catch (error) {
       console.error('Auth check failed:', error.message);
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post('/api/auth/login', formData, { withCredentials: true });
       await checkUserLoggedIn(); // Force refresh user state
-      return response.data; // Return the user data
+      return response.data; // Return the user data (including role)
     } catch (err) {
       throw new Error(err.response?.data?.message || 'Login failed');
     }

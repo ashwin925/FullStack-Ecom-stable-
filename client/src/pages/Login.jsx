@@ -14,14 +14,14 @@ const Login = () => {
     try {
       const response = await login(formData); // Get the response from the login function
       const { role } = response; // Destructure the role from the response
-
-      // Redirect based on role
-      if (role === 'admin') {
-        navigate('/admin');
+  
+      // Redirect to the appropriate dashboard
+      if (role === 'buyer') {
+        navigate('/user');
       } else if (role === 'seller') {
         navigate('/seller');
-      } else {
-        navigate('/user');
+      } else if (role === 'admin') {
+        navigate('/admin');
       }
     } catch (error) {
       setError(error.message || 'Login failed');

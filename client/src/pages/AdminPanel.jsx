@@ -1,15 +1,15 @@
-import { useAuth } from '../context/AuthContext';
+  import { useAuth } from '../context/AuthContext';
 
-const AdminPanel = () => {
-  const { user } = useAuth();
+  const AdminPanel = () => {
+    const { user } = useAuth();
 
-  return (
-    <div className="admin-panel">
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, {user?.name}</p>
-      {/* Add admin-specific content here */}
-    </div>
-  );
-};
+    return (
+      <div className="admin-panel">
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, {user?.name}</p>
+        {/* Add admin-specific content here */}
+      </div>
+    );
+  };
 
-export default AdminPanel;
+  export default AdminPanel;

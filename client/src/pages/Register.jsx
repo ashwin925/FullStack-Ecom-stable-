@@ -8,7 +8,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    role: 'user'
+    role: 'buyer'
   });
   const [error, setError] = useState('');
   const { register } = useAuth();
@@ -66,7 +66,7 @@ const Register = () => {
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
           >
-            <option value="user">Buyer</option>
+            <option value="buyer">Buyer</option>
             <option value="seller">Seller</option>
           </select>
         </div>
@@ -76,7 +76,7 @@ const Register = () => {
         </button>
       </form>
 
-      <div className="login-link">
+      <div className="login-link">  
         Already have an account? <Link to="/login">Login here</Link>
       </div>
     </div>

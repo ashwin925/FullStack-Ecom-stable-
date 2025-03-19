@@ -42,15 +42,15 @@ function App() {
             <Route
               path="/admin"
               element={
-                <AdminRoute>
-                  <AdminPanel />
-                </AdminRoute>
+              <PrivateRoute roles={['admin']}>
+                <AdminPanel />
+              </PrivateRoute>
               }
             />
             <Route
               path="/seller"
               element={
-                <PrivateRoute roles={['seller', 'admin']}>
+                <PrivateRoute roles={['seller']}>
                   <SellerPanel />
                 </PrivateRoute>
               }
@@ -58,7 +58,7 @@ function App() {
             <Route
               path="/user"
               element={
-                <PrivateRoute roles={['user']}>
+                <PrivateRoute roles={['buyer']}>
                   <UserPanel />
                 </PrivateRoute>
               }
