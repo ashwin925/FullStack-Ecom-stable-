@@ -2,7 +2,6 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 
-
 // @desc    Register user
 // @route   POST /api/auth/register
 export const register = asyncHandler(async (req, res) => {

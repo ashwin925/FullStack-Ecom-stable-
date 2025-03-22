@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      await axios.post('/api/auth/register', formData, { withCredentials: true });
-      await checkUserLoggedIn(); // Force refresh user state
+      const response = await axios.post('/api/auth/register', formData, { withCredentials: true });
+      return response.data; // Return the response data
     } catch (err) {
       throw new Error(err.response?.data?.message || 'Registration failed');
     }
