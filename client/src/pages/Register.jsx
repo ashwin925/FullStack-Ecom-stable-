@@ -18,9 +18,9 @@ const Register = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await register(formData); // Send registration request
-      console.log('Registration Response:', response); // Log the response for debugging
-      navigate('/dashboard'); // Redirect to dashboard (temporary fix)
+      const response = await register(formData); 
+      console.log('Registration Response:', response); 
+      navigate('/dashboard'); 
     } catch (error) {
       setError(error.message || 'Registration failed');
     }
@@ -84,4 +84,4 @@ const Register = () => {
   );
 };
 
-export default Register; // Proper default export
+export default Register; 

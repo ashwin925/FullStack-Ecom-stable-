@@ -2,19 +2,12 @@ import asyncHandler from 'express-async-handler';
 import Product from '../models/Product.js';
 
 
-// @desc    Get all products
-// @route   GET /api/products
-// @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({});
   res.json(products);
 });
 
-// Add other product controller functions as needed
-// (createProduct, updateProduct, deleteProduct etc)
-// @desc    Create a product
-// @route   POST /api/products
-// @access  Private/Seller
+
 export const createProduct = asyncHandler(async (req, res) => {
   const product = new Product({
     name: req.body.name,
@@ -27,9 +20,6 @@ export const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(createdProduct);
 });
 
-// @desc    Update a product
-// @route   PUT /api/products/:id
-// @access  Private/Seller
 export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
@@ -46,9 +36,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
-// @access  Private/Seller
+
 export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
