@@ -35,4 +35,7 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-export default mongoose.model('User', userSchema);
+// Explicitly specify the collection name
+const User = mongoose.model('User', userSchema, 'users');
+
+export default User;

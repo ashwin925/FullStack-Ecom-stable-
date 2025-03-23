@@ -18,6 +18,7 @@ const Register = () => {
     e.preventDefault();
     setError('');
     try {
+      console.log('Registration Payload:', formData); // Log the payload
       const response = await register(formData); 
       console.log('Registration Response:', response); 
       navigate('/dashboard'); 

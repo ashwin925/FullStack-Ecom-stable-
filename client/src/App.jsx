@@ -6,8 +6,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
-import SellerPanel from './pages/SellerPanel'; // Add this import
-import UserPanel from './pages/UserPanel'; // Add this import
+import SellerPanel from './pages/SellerPanel'; 
+import UserPanel from './pages/UserPanel'; 
+import CartPage from './pages/CartPage'; 
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
@@ -60,6 +61,14 @@ function App() {
               element={
                 <PrivateRoute roles={['buyer']}>
                   <UserPanel />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <PrivateRoute roles={['buyer']}>
+                  <CartPage />
                 </PrivateRoute>
               }
             />

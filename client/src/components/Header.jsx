@@ -12,6 +12,8 @@ export default function Header() {
           <>
             <button onClick={logout}>Logout</button>
             {user.role === 'admin' && <Link to="/admin">Admin</Link>}
+            {user.role === 'seller' && <Link to="/seller">Seller</Link>}
+            {user.role === 'buyer' && <Link to="/cart">Cart</Link>}
           </>
         ) : (
           <>
