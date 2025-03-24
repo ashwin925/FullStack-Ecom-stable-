@@ -98,13 +98,30 @@ const CartPage = () => {
                     <h3>{item.product.name}</h3>
                     <p>Price: ${item.product.price}</p>
                     <p>Quantity: {item.quantity}</p>
-                    <button onClick={() => updateQuantity(item.product._id, item.quantity + 1)}>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default behavior
+                        updateQuantity(item.product._id, item.quantity + 1);
+                      }}
+                    >
                       +
                     </button>
-                    <button onClick={() => updateQuantity(item.product._id, item.quantity - 1)}>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default behavior
+                        updateQuantity(item.product._id, item.quantity - 1);
+                      }}
+                    >
                       -
                     </button>
-                    <button onClick={() => removeFromCart(item.product._id)}>Remove</button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default behavior
+                        removeFromCart(item.product._id);
+                      }}
+                    >
+                      Remove
+                    </button>
                   </li>
                 )
               ))}
