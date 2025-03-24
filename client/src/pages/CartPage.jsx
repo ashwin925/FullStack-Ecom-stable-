@@ -7,24 +7,25 @@ const CartPage = () => {
   const { user } = useAuth();
   const [cart, setCart] = useState(null);
   const [error, setError] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigate = useNavigate();
 
   // Fetch the user's cart
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const response = await axios.get('/api/cart', {
-          withCredentials: true,
-          headers: {
-            'User-ID': user.id, // Pass the user ID if required
-          },
-        });
-        setCart(response.data);
-      } catch (error) {
-        setError(error.message || 'Failed to fetch cart');
-      }
-    };
+  const fetchCart = async () => {
+    try {
+      const response = await axios.get('/api/cart', {
+        withCredentials: true,
+        headers: {
+          'User-ID': user.id,
+        },
+      });
+      setCart(response.data);
+    } catch (error) {
+      setError(error.message || 'Failed to fetch cart');
+    }
+  };
 
+  useEffect(() => {
     if (user) {
       fetchCart();
     }
@@ -32,39 +33,35 @@ const CartPage = () => {
 
   // Remove a product from the cart
   const removeFromCart = async (productId) => {
-    if (!productId) {
-      setError('Product ID is missing');
-      return;
-    }
-
+    if (!productId || isUpdating) return;
+    
+    setIsUpdating(true);
     try {
       await axios.delete(`/api/cart/${productId}`, { withCredentials: true });
-      setCart((prevCart) => ({
-        ...prevCart,
-        products: prevCart.products.filter((item) => item.product._id !== productId),
-      }));
+      await fetchCart(); // Refresh cart data
     } catch (error) {
       setError(error.message || 'Failed to remove product from cart');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   // Update the quantity of a product in the cart
   const updateQuantity = async (productId, newQuantity) => {
-    if (!productId) {
-      setError('Product ID is missing');
-      return;
-    }
-    if (newQuantity < 1) return;
-
+    if (!productId || isUpdating || newQuantity < 1) return;
+    
+    setIsUpdating(true);
     try {
-      const response = await axios.put(
+      await axios.put(
         `/api/cart/${productId}`,
         { quantity: newQuantity },
         { withCredentials: true }
       );
-      setCart(response.data);
+      await fetchCart(); // Refresh cart data
     } catch (error) {
       setError(error.message || 'Failed to update quantity');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -84,57 +81,67 @@ const CartPage = () => {
   };
 
   return (
-    <div>
+    <div className="cart-page">
       <h1>Your Cart</h1>
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
       {cart ? (
         <>
           {cart.products.length > 0 ? (
-            <ul>
+            <ul className="cart-items">
               {cart.products.map((item) => (
-                item.product._id && ( // Ensure product._id exists
-                  <li key={item.product._id}>
+                <li key={`${item.product._id}-${item.quantity}`} className="cart-item">
+                  <div className="product-info">
                     <h3>{item.product.name}</h3>
                     <p>Price: ${item.product.price}</p>
                     <p>Quantity: {item.quantity}</p>
+                  </div>
+                  <div className="item-controls">
                     <button
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent default behavior
-                        updateQuantity(item.product._id, item.quantity + 1);
-                      }}
+                      type="button"
+                      className="quantity-btn"
+                      disabled={isUpdating}
+                      onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
                     >
                       +
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent default behavior
-                        updateQuantity(item.product._id, item.quantity - 1);
-                      }}
+                      type="button"
+                      className="quantity-btn"
+                      disabled={isUpdating || item.quantity <= 1}
+                      onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
                     >
                       -
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent default behavior
-                        removeFromCart(item.product._id);
-                      }}
+                      type="button"
+                      className="remove-btn"
+                      disabled={isUpdating}
+                      onClick={() => removeFromCart(item.product._id)}
                     >
                       Remove
                     </button>
-                  </li>
-                )
+                  </div>
+                </li>
               ))}
             </ul>
           ) : (
-            <p>Your cart is empty.</p>
+            <p className="empty-cart">Your cart is empty.</p>
           )}
 
-          <h2>Total: ${calculateTotal()}</h2>
-          <button onClick={handleCheckout}>Proceed to Checkout</button>
+          <div className="cart-summary">
+            <h2>Total: ${calculateTotal().toFixed(2)}</h2>
+            <button 
+              className="checkout-btn"
+              onClick={handleCheckout}
+              disabled={!cart?.products?.length || isUpdating}
+            >
+              Proceed to Checkout
+            </button>
+          </div>
         </>
       ) : (
-        <p>Loading cart...</p>
+        <p className="loading">Loading cart...</p>
       )}
     </div>
   );
