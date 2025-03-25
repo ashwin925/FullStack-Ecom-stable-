@@ -1,0 +1,40 @@
+/* AdminPanel.css */
+.has-requests {
+  background: #ff6b6b;
+  color: white;
+}
+
+.requests-list {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.requests-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.requests-list li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.request-actions button {
+  margin-right: 10px;
+  padding: 5px 10px;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+.welcome-message {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: #555;
+}

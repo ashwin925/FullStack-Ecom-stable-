@@ -10,6 +10,8 @@ import cartRoutes from './routes/cart.js'; // Add this line
 import errorHandler from './middleware/error.js';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import adminRoutes from './routes/adminRoutes.js';
+
 
 dotenv.config();
 
@@ -52,7 +54,8 @@ connectDB().then(() => {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/products', productRoutes);
-  app.use('/api/cart', cartRoutes); // Add this line
+  app.use('/api/cart', cartRoutes); 
+  app.use('/api/admin', adminRoutes);
 
   app.use(errorHandler);
 

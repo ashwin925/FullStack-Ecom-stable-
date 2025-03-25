@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-import "./userPanel.css";
 
 const UserPanel = () => {
   const { user, updateUser } = useAuth();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [showPermissionForm, setShowPermissionForm] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
-    email: user?.email || '',
-    password: '',
     profilePicture: null,
     profilePictureUrl: user?.profilePicture || ''
   });
+  const [permissionRequest, setPermissionRequest] = useState({
+    oldEmail: user?.email || '',
+    newEmail: '',
+    oldPassword: '',
+    newPassword: '',
+    description: ''
+  });
   const [success, setSuccess] = useState('');
 
-  // Fetch products (existing functionality)
+  // Fetch products (existing)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -30,14 +35,12 @@ const UserPanel = () => {
     fetchProducts();
   }, []);
 
-  // Handle profile updates
+  // Handle profile updates (name/picture only)
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
       const formPayload = new FormData();
       formPayload.append('name', formData.name);
-      formPayload.append('email', formData.email);
-      if (formData.password) formPayload.append('password', formData.password);
       if (formData.profilePicture) {
         formPayload.append('profilePicture', formData.profilePicture);
       }
@@ -57,7 +60,25 @@ const UserPanel = () => {
     }
   };
 
-  // Handle file upload preview
+  // Handle permission request submission
+  const handlePermissionRequest = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/admin/requests', {
+        userId: user._id,
+        userName: user.name,
+        ...permissionRequest
+      }, { withCredentials: true });
+
+      setSuccess('Permission request sent to Admin!');
+      setError('');
+      setShowPermissionForm(false);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Request failed');
+    }
+  };
+
+  // File upload preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -69,7 +90,7 @@ const UserPanel = () => {
     }
   };
 
-  // Add to cart (existing functionality)
+  // Add to cart (existing)
   const addToCart = async (productId) => {
     try {
       await axios.post('/api/cart', { productId, quantity: 1 }, { withCredentials: true });
@@ -82,55 +103,150 @@ const UserPanel = () => {
   return (
     <div className="user-panel">
       <h1>Welcome, {user?.name}!</h1>
-      <p>You are a buyer.</p>
 
       {/* Profile Section */}
       <div className="profile-section">
         {isEditing ? (
-          <form onSubmit={handleProfileUpdate}>
-            {error && <div className="error">{error}</div>}
-            {success && <div className="success">{success}</div>}
+          <>
+            <form onSubmit={handleProfileUpdate}>
+              {error && <div className="error">{error}</div>}
+              {success && <div className="success">{success}</div>}
 
-            <div className="form-group">
-              <label>Profile Picture</label>
-              <img 
-                src={formData.profilePictureUrl || '/default-profile.png'} 
-                alt="Profile" 
-                width="100"
-              />
-              <input type="file" onChange={handleFileChange} accept="image/*" />
-            </div>
+              <div className="form-group">
+                <label>Profile Picture</label>
+                <img 
+                  src={formData.profilePictureUrl || '/default-profile.png'} 
+                  alt="Profile" 
+                  width="100"
+                />
+                <input type="file" onChange={handleFileChange} accept="image/*" />
+              </div>
 
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={user?.email}
+                  disabled
+                />
+                <span className="permission-tag">* Requires Admin Permission</span>
+              </div>
 
-            <div className="form-group">
-              <label>New Password (leave blank to keep current)</label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-            </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="********"
+                  disabled
+                />
+                <span className="permission-tag">* Requires Admin Permission</span>
+              </div>
 
-            <button type="submit">Save</button>
-            <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-          </form>
+              <div className="form-actions">
+                <button type="submit">Save</button>
+                <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
+                <button 
+                  type="button" 
+                  className="request-btn"
+                  onClick={() => setShowPermissionForm(true)}
+                >
+                  Request Permission
+                </button>
+              </div>
+            </form>
+
+            {/* Permission Request Form (Popup) */}
+            {showPermissionForm && (
+              <div className="permission-popup">
+                <h3>Request Admin Permission</h3>
+                <form onSubmit={handlePermissionRequest}>
+                  <div className="form-group">
+                    <label>Current Email *</label>
+                    <input
+                      type="email"
+                      value={permissionRequest.oldEmail}
+                      onChange={(e) => setPermissionRequest({ 
+                        ...permissionRequest, 
+                        oldEmail: e.target.value 
+                      })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>New Email *</label>
+                    <input
+                      type="email"
+                      value={permissionRequest.newEmail}
+                      onChange={(e) => setPermissionRequest({ 
+                        ...permissionRequest, 
+                        newEmail: e.target.value 
+                      })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Current Password *</label>
+                    <input
+                      type="password"
+                      value={permissionRequest.oldPassword}
+                      onChange={(e) => setPermissionRequest({ 
+                        ...permissionRequest, 
+                        oldPassword: e.target.value 
+                      })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>New Password *</label>
+                    <input
+                      type="password"
+                      value={permissionRequest.newPassword}
+                      onChange={(e) => setPermissionRequest({ 
+                        ...permissionRequest, 
+                        newPassword: e.target.value 
+                      })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Reason for Change *</label>
+                    <textarea
+                      value={permissionRequest.description}
+                      onChange={(e) => setPermissionRequest({ 
+                        ...permissionRequest, 
+                        description: e.target.value 
+                      })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="submit">Submit Request</button>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPermissionForm(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </>
         ) : (
           <div className="profile-display">
             <img 
@@ -147,7 +263,6 @@ const UserPanel = () => {
 
       {/* Products Section (existing) */}
       <h2>All Products</h2>
-      {error && <div className="error">{error}</div>}
       {products.length > 0 ? (
         <ul className="product-list">
           {products.map((product) => (
