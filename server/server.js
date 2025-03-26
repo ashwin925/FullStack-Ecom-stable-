@@ -1,7 +1,6 @@
+import './config/firebase.js';
 import express from 'express';
 import session from 'express-session';
-import MongoStore from 'connect-mongo';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
@@ -9,7 +8,6 @@ import productRoutes from './routes/products.js';
 import cartRoutes from './routes/cart.js'; // Add this line
 import errorHandler from './middleware/error.js';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 

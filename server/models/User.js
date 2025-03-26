@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import db from "../config/firebase.js";
 
 const userSchema = new mongoose.Schema({
   name: {
