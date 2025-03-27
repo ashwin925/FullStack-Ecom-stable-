@@ -1,20 +1,20 @@
 import express from 'express';
 import { protect } from '../middleware/auth.js';
 import {
+  getCart,
   addToCart,
   removeFromCart,
-  getCart,
-  updateCartItemQuantity, // Add this line
+  updateCartItemQuantity
 } from '../controllers/cartController.js';
 
 const router = express.Router();
 
 router.route('/')
-  .get(protect, getCart) // Get the user's cart
-  .post(protect, addToCart); // Add a product to the cart
+  .get(protect, getCart)
+  .post(protect, addToCart);
 
 router.route('/:productId')
-  .delete(protect, removeFromCart) // Remove a product from the cart
-  .put(protect, updateCartItemQuantity); // Update the quantity of a product in the cart
+  .delete(protect, removeFromCart)
+  .put(protect, updateCartItemQuantity);
 
 export default router;

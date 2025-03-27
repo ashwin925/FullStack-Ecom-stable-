@@ -1,44 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserPanel = () => {
   const { user, updateUser } = useAuth();
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [showPermissionForm, setShowPermissionForm] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     profilePicture: null,
     profilePictureUrl: user?.profilePicture || ''
   });
-  const [permissionRequest, setPermissionRequest] = useState({
-    oldEmail: user?.email || '',
-    newEmail: '',
-    oldPassword: '',
-    newPassword: '',
-    description: ''
-  });
-  const [success, setSuccess] = useState('');
+  const [hasChangedName, setHasChangedName] = useState(user?.hasChangedName || false);
 
-  // Fetch products (existing)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products', { withCredentials: true });
-        setProducts(response.data);
-      } catch (error) {
-        setError(error.message || 'Failed to fetch products');
+        const { data } = await axios.get('/api/products', { withCredentials: true });
+        setProducts(data);
+      } catch {
+        toast.error('Failed to load products');
       }
     };
     fetchProducts();
   }, []);
 
-  // Handle profile updates (name/picture only)
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
+      if (hasChangedName && formData.name !== user.name) {
+        toast.error('You can only change your name once!');
+        return;
+      }
+
       const formPayload = new FormData();
       formPayload.append('name', formData.name);
       if (formData.profilePicture) {
@@ -51,34 +47,16 @@ const UserPanel = () => {
       });
 
       updateUser(data);
-      setSuccess('Profile updated successfully!');
-      setError('');
+      toast.success('Profile updated successfully!');
       setIsEditing(false);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Update failed');
-      setSuccess('');
+      if (formData.name !== user.name) {
+        setHasChangedName(true);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Update failed');
     }
   };
 
-  // Handle permission request submission
-  const handlePermissionRequest = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/admin/requests', {
-        userId: user._id,
-        userName: user.name,
-        ...permissionRequest
-      }, { withCredentials: true });
-
-      setSuccess('Permission request sent to Admin!');
-      setError('');
-      setShowPermissionForm(false);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Request failed');
-    }
-  };
-
-  // File upload preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -90,192 +68,104 @@ const UserPanel = () => {
     }
   };
 
-  // Add to cart (existing)
   const addToCart = async (productId) => {
     try {
       await axios.post('/api/cart', { productId, quantity: 1 }, { withCredentials: true });
-      alert('Product added to cart!');
+      toast.success('Product added to cart!');
     } catch (error) {
-      setError(error.message || 'Failed to add product to cart');
+      toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
 
   return (
     <div className="user-panel">
+      <ToastContainer />
       <h1>Welcome, {user?.name}!</h1>
 
-      {/* Profile Section */}
       <div className="profile-section">
         {isEditing ? (
-          <>
-            <form onSubmit={handleProfileUpdate}>
-              {error && <div className="error">{error}</div>}
-              {success && <div className="success">{success}</div>}
-
-              <div className="form-group">
-                <label>Profile Picture</label>
-                <img 
-                  src={formData.profilePictureUrl || '/default-profile.png'} 
-                  alt="Profile" 
-                  width="100"
-                />
-                <input type="file" onChange={handleFileChange} accept="image/*" />
-              </div>
-
-              <div className="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={user?.email}
-                  disabled
-                />
-                <span className="permission-tag">* Requires Admin Permission</span>
-              </div>
-
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="********"
-                  disabled
-                />
-                <span className="permission-tag">* Requires Admin Permission</span>
-              </div>
-
-              <div className="form-actions">
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-                <button 
-                  type="button" 
-                  className="request-btn"
-                  onClick={() => setShowPermissionForm(true)}
-                >
-                  Request Permission
-                </button>
-              </div>
-            </form>
-
-            {/* Permission Request Form (Popup) */}
-            {showPermissionForm && (
-              <div className="permission-popup">
-                <h3>Request Admin Permission</h3>
-                <form onSubmit={handlePermissionRequest}>
-                  <div className="form-group">
-                    <label>Current Email *</label>
-                    <input
-                      type="email"
-                      value={permissionRequest.oldEmail}
-                      onChange={(e) => setPermissionRequest({ 
-                        ...permissionRequest, 
-                        oldEmail: e.target.value 
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>New Email *</label>
-                    <input
-                      type="email"
-                      value={permissionRequest.newEmail}
-                      onChange={(e) => setPermissionRequest({ 
-                        ...permissionRequest, 
-                        newEmail: e.target.value 
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Current Password *</label>
-                    <input
-                      type="password"
-                      value={permissionRequest.oldPassword}
-                      onChange={(e) => setPermissionRequest({ 
-                        ...permissionRequest, 
-                        oldPassword: e.target.value 
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>New Password *</label>
-                    <input
-                      type="password"
-                      value={permissionRequest.newPassword}
-                      onChange={(e) => setPermissionRequest({ 
-                        ...permissionRequest, 
-                        newPassword: e.target.value 
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Reason for Change *</label>
-                    <textarea
-                      value={permissionRequest.description}
-                      onChange={(e) => setPermissionRequest({ 
-                        ...permissionRequest, 
-                        description: e.target.value 
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-actions">
-                    <button type="submit">Submit Request</button>
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPermissionForm(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+          <form onSubmit={handleProfileUpdate} className="profile-form">
+            {hasChangedName && (
+              <div className="name-change-warning">
+                ⚠️ You can change your name only once!
               </div>
             )}
-          </>
+            <div className="form-group">
+              <label>Profile Picture</label>
+              <img 
+                src={formData.profilePictureUrl || '/default-profile.png'} 
+                alt="Profile" 
+                className="profile-image"
+              />
+              <input 
+                type="file" 
+                onChange={handleFileChange} 
+                accept="image/*"
+                className="file-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                required
+                disabled={hasChangedName && formData.name !== user.name}
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="save-btn">Save Changes</button>
+              <button 
+                type="button" 
+                onClick={() => setIsEditing(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         ) : (
           <div className="profile-display">
             <img 
               src={user?.profilePicture || '/default-profile.png'} 
               alt="Profile" 
-              width="100"
+              className="profile-image"
             />
             <h3>{user?.name}</h3>
             <p>{user?.email}</p>
-            <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="edit-btn"
+            >
+              Edit Profile
+            </button>
           </div>
         )}
       </div>
 
-      {/* Products Section (existing) */}
-      <h2>All Products</h2>
-      {products.length > 0 ? (
-        <ul className="product-list">
-          {products.map((product) => (
-            <li key={product._id}>
-              <h3>{product.name}</h3>
-              <p>Price: ${product.price}</p>
-              <button onClick={() => addToCart(product._id)}>Add to Cart</button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No products found.</p>
-      )}
+      <div className="products-section">
+        <h2>Available Products</h2>
+        {products.length > 0 ? (
+          <div className="product-grid">
+            {products.map(product => (
+              <div key={product.id} className="product-card">
+                <h3>{product.name}</h3>
+                <p className="price">${product.price.toFixed(2)}</p>
+                <p className="description">{product.description}</p>
+                <button 
+                  onClick={() => addToCart(product.id)}
+                  className="add-to-cart-btn"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No products available.</p>
+        )}
+      </div>
     </div>
   );
 };

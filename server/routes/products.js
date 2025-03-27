@@ -14,7 +14,7 @@ router.route('/')
   .post(protect, seller, createProduct);
 
 router.route('/:id')
-  .put(protect, seller, updateProduct)
-  .delete(protect, seller, deleteProduct);
+  .delete(protect, seller, deleteProduct)
+  .put(protect, seller, updateProduct);
 
 export default router;

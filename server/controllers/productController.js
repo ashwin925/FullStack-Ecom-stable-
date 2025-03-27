@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { productsCol } from '../config/firebaseDB.js';
+import { productsCol, cartsCol, db, FieldValue } from '../config/firebaseDB.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
   const snapshot = await productsCol.get();
@@ -18,7 +18,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     price: Number(price),
     description,
     seller: req.user.id,
-    createdAt: new Date().toISOString()
+    createdAt: FieldValue.serverTimestamp()
   };
 
   const docRef = await productsCol.add(product);
@@ -45,7 +45,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
   await productRef.update({
     name: name || productDoc.data().name,
     price: price ? Number(price) : productDoc.data().price,
-    description: description || productDoc.data().description
+    description: description || productDoc.data().description,
+    updatedAt: FieldValue.serverTimestamp()
   });
 
   const updatedDoc = await productRef.get();
@@ -61,10 +62,25 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   const productDoc = await productRef.get();
 
   if (!productDoc.exists) {
-    res.status(404);
-    throw new Error('Product not found');
+    return res.status(404).json({ message: 'Product not found' });
   }
 
+  // Verify seller owns the product or is admin
+  if (req.user.role !== 'admin' && productDoc.data().seller !== req.user.id) {
+    return res.status(403).json({ message: 'Not authorized' });
+  }
+
+  // Remove product from all carts
+  const cartsSnapshot = await cartsCol.where('products', 'array-contains', { productId: id }).get();
+  const batch = db.batch();
+  
+  cartsSnapshot.docs.forEach(cartDoc => {
+    const updatedProducts = cartDoc.data().products.filter(p => p.productId !== id);
+    batch.update(cartDoc.ref, { products: updatedProducts });
+  });
+  
+  await batch.commit();
   await productRef.delete();
-  res.json({ message: 'Product removed' });
+  
+  res.json({ message: 'Product removed successfully' });
 });
