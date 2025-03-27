@@ -1,7 +1,5 @@
 // server/controllers/adminController.js
 import asyncHandler from 'express-async-handler';
-import PermissionRequest from '../models/PermissionRequest.js';
-import User from '../models/User.js';
 
 // @desc    Create a permission request
 // @route   POST /api/admin/requests

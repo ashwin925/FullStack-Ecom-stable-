@@ -1,50 +1,70 @@
 import asyncHandler from 'express-async-handler';
-import Product from '../models/Product.js';
-
+import { productsCol } from '../config/firebaseDB.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  const snapshot = await productsCol.get();
+  const products = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
   res.json(products);
 });
 
-
 export const createProduct = asyncHandler(async (req, res) => {
-  const product = new Product({
-    name: req.body.name,
-    price: req.body.price,
-    description: req.body.description,
-    seller: req.user._id
-  });
+  const { name, price, description } = req.body;
 
-  const createdProduct = await product.save();
-  res.status(201).json(createdProduct);
+  const product = {
+    name,
+    price: Number(price),
+    description,
+    seller: req.user.id,
+    createdAt: new Date().toISOString()
+  };
+
+  const docRef = await productsCol.add(product);
+  const productDoc = await docRef.get();
+  
+  res.status(201).json({
+    id: docRef.id,
+    ...productDoc.data()
+  });
 });
 
 export const updateProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const { id } = req.params;
+  const { name, price, description } = req.body;
 
-  if (product) {
-    product.name = req.body.name || product.name;
-    product.price = req.body.price || product.price;
-    product.description = req.body.description || product.description;
+  const productRef = productsCol.doc(id);
+  const productDoc = await productRef.get();
 
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
-  } else {
+  if (!productDoc.exists) {
     res.status(404);
     throw new Error('Product not found');
   }
+
+  await productRef.update({
+    name: name || productDoc.data().name,
+    price: price ? Number(price) : productDoc.data().price,
+    description: description || productDoc.data().description
+  });
+
+  const updatedDoc = await productRef.get();
+  res.json({
+    id: updatedDoc.id,
+    ...updatedDoc.data()
+  });
 });
 
-
 export const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const { id } = req.params;
+  const productRef = productsCol.doc(id);
+  const productDoc = await productRef.get();
 
-  if (product) {
-    await product.deleteOne();
-    res.json({ message: 'Product removed' });
-  } else {
+  if (!productDoc.exists) {
     res.status(404);
     throw new Error('Product not found');
   }
+
+  await productRef.delete();
+  res.json({ message: 'Product removed' });
 });

@@ -1,90 +1,124 @@
 import asyncHandler from 'express-async-handler';
-import User from '../models/User.js';
+import { usersCol } from '../config/firebaseDB.js';
 import bcrypt from 'bcryptjs';
 
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role = 'buyer' } = req.body;
 
   // Check if user already exists
-  const userExists = await User.findOne({ email });
-  if (userExists) {
+  const snapshot = await usersCol.where('email', '==', email).get();
+  if (!snapshot.empty) {
     res.status(400);
-    throw new Error('User already exists');
+    throw new Error('User with this email already exists');
   }
 
-  // Create the user
-  const user = await User.create({ name, email, password, role });
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Log the created user for debugging
-  console.log('User created:', user);
+  // Create user document
+  const userRef = await usersCol.add({
+    name,
+    email,
+    password: hashedPassword,
+    role,
+    createdAt: new Date().toISOString()
+  });
 
-  // Store user data in session
+  // Get the created user data
+  const userDoc = await userRef.get();
+  const user = { id: userDoc.id, ...userDoc.data() };
+
+  // Set session
   req.session.user = {
-    _id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: user.role
   };
 
   res.status(201).json({
-    _id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: user.role
   });
 });
-
 
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    res.status(401);
-    throw new Error('Invalid email or password');
+  console.log('Login attempt for:', email); // Debug log
+
+  // Find user by email
+  const snapshot = await usersCol.where('email', '==', email).limit(1).get();
+  
+  if (snapshot.empty) {
+    console.log('User not found'); // Debug log
+    res.status(401).json({ message: 'Invalid email or password' });
+    return;
   }
 
+  const userDoc = snapshot.docs[0];
+  const user = { id: userDoc.id, ...userDoc.data() };
+
+  console.log('Found user:', user.email); // Debug log
+
+  // Compare passwords
   const isMatch = await bcrypt.compare(password, user.password);
+  console.log('Password match:', isMatch); // Debug log
+
   if (!isMatch) {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    res.status(401).json({ message: 'Invalid email or password' });
+    return;
   }
 
+  // Set session
   req.session.user = {
-    _id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: user.role
   };
 
+  console.log('Session set:', req.session.user); // Debug log
+
   res.json({
-    _id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: user.role
   });
 });
 
-
 export const logout = asyncHandler(async (req, res) => {
-  req.session.destroy((err) => {
+  req.session.destroy(err => {
     if (err) {
       res.status(500).json({ message: 'Logout failed' });
     } else {
-      res.clearCookie('connect.sid'); 
+      res.clearCookie('connect.sid');
       res.json({ message: 'Successfully logged out' });
     }
   });
 });
 
-
 export const getMe = asyncHandler(async (req, res) => {
-  const user = req.session.user;
-  if (!user) {
+  if (!req.session.user) {
     res.status(401);
-    throw new Error('Not authorized');
+    throw new Error('Not authenticated');
   }
 
-  const userData = await User.findById(user._id).select('-password');
-  res.json(userData);
+  const userDoc = await usersCol.doc(req.session.user.id).get();
+  if (!userDoc.exists) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const user = userDoc.data();
+  res.json({
+    id: userDoc.id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  });
 });

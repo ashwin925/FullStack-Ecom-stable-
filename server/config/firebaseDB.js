@@ -1,11 +1,22 @@
 import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import serviceAccount from './serviceAccountKey.json' assert { type: "json" };
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { createRequire } from 'module';
 
-// Initialize Firebase
-initializeApp({
-  credential: cert(serviceAccount)
+const require = createRequire(import.meta.url);
+const serviceAccount = require('./serviceAccountKey.json');
+
+const app = initializeApp({
+  credential: cert(serviceAccount),
+  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
 });
 
 const db = getFirestore();
-export default db;
+db.settings({ ignoreUndefinedProperties: true });
+
+// Collections
+const usersCol = db.collection('users');
+const productsCol = db.collection('products');
+const cartsCol = db.collection('carts');
+
+// Export FieldValue separately
+export { db, usersCol, productsCol, cartsCol, FieldValue };
