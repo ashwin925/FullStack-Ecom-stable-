@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const UserPanel = () => {
   const { user, updateUser } = useAuth();
@@ -37,6 +38,7 @@ const UserPanel = () => {
 
       const formPayload = new FormData();
       formPayload.append('name', formData.name);
+      
       if (formData.profilePicture) {
         formPayload.append('profilePicture', formData.profilePicture);
       }
@@ -49,11 +51,14 @@ const UserPanel = () => {
       updateUser(data);
       toast.success('Profile updated successfully!');
       setIsEditing(false);
+      
       if (formData.name !== user.name) {
         setHasChangedName(true);
+        // Update backend to remember name was changed
+        await axios.patch(`/api/users/${user.id}`, { hasChangedName: true });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Update failed');
+      toast.error(error.response?.data?.message || 'Update failed. Please try again.');
     }
   };
 
@@ -85,9 +90,20 @@ const UserPanel = () => {
       <div className="profile-section">
         {isEditing ? (
           <form onSubmit={handleProfileUpdate} className="profile-form">
-            {hasChangedName && (
-              <div className="name-change-warning">
-                ⚠️ You can change your name only once!
+            {hasChangedName && formData.name !== user.name && (
+              <div className="name-change-warning" style={{
+                backgroundColor: '#ffebee',
+                border: '1px solid #f44336',
+                color: '#f44336',
+                padding: '10px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                margin: '10px 0'
+              }}>
+                <FaExclamationTriangle />
+                <span>You can change your name only once!</span>
               </div>
             )}
             <div className="form-group">

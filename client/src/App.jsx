@@ -12,6 +12,8 @@ import CartPage from './pages/CartPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function ErrorFallback({ error }) {
   return (
@@ -72,6 +74,8 @@ function App() {
                 </PrivateRoute>
               }
             />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
         </AuthProvider>
       </Router>
