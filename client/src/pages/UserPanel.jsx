@@ -6,72 +6,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaExclamationTriangle } from 'react-icons/fa';
 
 const UserPanel = () => {
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    profilePicture: null,
-    profilePictureUrl: user?.profilePicture || ''
-  });
-  const [hasChangedName, setHasChangedName] = useState(user?.hasChangedName || false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data } = await axios.get('/api/products', { withCredentials: true });
         setProducts(data);
-      } catch {
+      } catch(err) {
         toast.error('Failed to load products');
+        console.error('Fetch products error:', err);
       }
     };
     fetchProducts();
   }, []);
-
-  const handleProfileUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      if (hasChangedName && formData.name !== user.name) {
-        toast.error('You can only change your name once!');
-        return;
-      }
-
-      const formPayload = new FormData();
-      formPayload.append('name', formData.name);
-      
-      if (formData.profilePicture) {
-        formPayload.append('profilePicture', formData.profilePicture);
-      }
-
-      const { data } = await axios.put('/api/users/me', formPayload, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true
-      });
-
-      updateUser(data);
-      toast.success('Profile updated successfully!');
-      setIsEditing(false);
-      
-      if (formData.name !== user.name) {
-        setHasChangedName(true);
-        // Update backend to remember name was changed
-        await axios.patch(`/api/users/${user.id}`, { hasChangedName: true });
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Update failed. Please try again.');
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({
-        ...formData,
-        profilePicture: file,
-        profilePictureUrl: URL.createObjectURL(file)
-      });
-    }
-  };
 
   const addToCart = async (productId) => {
     try {
@@ -88,76 +37,21 @@ const UserPanel = () => {
       <h1>Welcome, {user?.name}!</h1>
 
       <div className="profile-section">
-        {isEditing ? (
-          <form onSubmit={handleProfileUpdate} className="profile-form">
-            {hasChangedName && formData.name !== user.name && (
-              <div className="name-change-warning" style={{
-                backgroundColor: '#ffebee',
-                border: '1px solid #f44336',
-                color: '#f44336',
-                padding: '10px',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                margin: '10px 0'
-              }}>
-                <FaExclamationTriangle />
-                <span>You can change your name only once!</span>
-              </div>
-            )}
-            <div className="form-group">
-              <label>Profile Picture</label>
-              <img 
-                src={formData.profilePictureUrl || '/default-profile.png'} 
-                alt="Profile" 
-                className="profile-image"
-              />
-              <input 
-                type="file" 
-                onChange={handleFileChange} 
-                accept="image/*"
-                className="file-input"
-              />
-            </div>
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                required
-                disabled={hasChangedName && formData.name !== user.name}
-              />
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="save-btn">Save Changes</button>
-              <button 
-                type="button" 
-                onClick={() => setIsEditing(false)}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="profile-display">
-            <img 
-              src={user?.profilePicture || '/default-profile.png'} 
-              alt="Profile" 
-              className="profile-image"
-            />
+        <div className="profile-display">
+          <img 
+            src={user?.profilePictureUrl || '/default-profile.png'} 
+            alt="Profile" 
+            className="profile-image"
+          />
+          <div className="profile-details">
             <h3>{user?.name}</h3>
-            <p>{user?.email}</p>
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="edit-btn"
-            >
-              Edit Profile
-            </button>
+            <p><strong>Email:</strong> {user?.email}</p>
+            {user?.phone && <p><strong>Phone:</strong> {user.phone}</p>}
+            {user?.dob && <p><strong>Birthday:</strong> {new Date(user.dob).toLocaleDateString()}</p>}
+            <p><strong>Gender:</strong> {user?.gender || 'Not specified'}</p>
+            <p><strong>Account Type:</strong> {user?.role}</p>
           </div>
-        )}
+        </div>
       </div>
 
       <div className="products-section">
@@ -167,7 +61,9 @@ const UserPanel = () => {
             {products.map(product => (
               <div key={product.id} className="product-card">
                 <h3>{product.name}</h3>
-                <p className="price">${product.price.toFixed(2)}</p>
+                <p className="price">
+                  ${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}
+                </p>
                 <p className="description">{product.description}</p>
                 <button 
                   onClick={() => addToCart(product.id)}

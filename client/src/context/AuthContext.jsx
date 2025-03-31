@@ -27,20 +27,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post('/api/auth/login', formData, { 
         withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
       
-      console.log('Login response:', response.data); // Debug log
-      
-      // Manually set user data if session isn't working
       const user = response.data;
       setUser(user);
-      
-      // Store in localStorage as fallback
       localStorage.setItem('user', JSON.stringify(user));
-      
       return user;
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
@@ -52,17 +44,21 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post('/api/auth/logout');
       setUser(null);
-    } catch (err) {
-      console.error('Logout failed:', err.message);
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error('Logout failed:', error.message);
     }
   };
 
   const register = async (formData) => {
     try {
-      const response = await axios.post('/api/auth/register', formData, { withCredentials: true });
-      return response.data; // Return the response data
-    } catch (err) {
-      throw new Error(err.response?.data?.message || 'Registration failed');
+      const response = await axios.post('/api/auth/register', formData, { 
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
   };
 

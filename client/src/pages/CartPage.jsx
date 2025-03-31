@@ -17,8 +17,9 @@ const CartPage = () => {
     try {
       const { data } = await axios.get('/api/cart', { withCredentials: true });
       setCart(data);
-    } catch {
+    } catch (err) {
       toast.error('Failed to load cart');
+      console.error('Fetch cart error:', err);
     } finally {
       setLoading(false);
     }
@@ -28,7 +29,6 @@ const CartPage = () => {
     if (newQuantity < 1) return;
     
     try {
-      // Optimistic update
       setCart(prev => ({
         ...prev,
         products: prev.products.map(item => 
@@ -43,15 +43,15 @@ const CartPage = () => {
         { quantity: newQuantity },
         { withCredentials: true }
       );
-    } catch {
+    } catch (err) {
       toast.error('Failed to update quantity');
-      fetchCart(); // Revert on error
+      console.error('quantity update error:', err);
+      fetchCart();
     }
   };
 
   const removeItem = async (productId) => {
     try {
-      // Optimistic update
       setCart(prev => ({
         ...prev,
         products: prev.products.filter(item => item.product.id !== productId)
@@ -59,16 +59,18 @@ const CartPage = () => {
       
       await axios.delete(`/api/cart/${productId}`, { withCredentials: true });
       toast.success('Product removed from cart');
-    } catch {
+    } catch (err) {
       toast.error('Failed to remove item');
-      fetchCart(); // Revert on error
+      console.error('remove item error:', err);
+      fetchCart();
     }
   };
 
   const calculateTotal = () => {
     if (!cart?.products) return 0;
     return cart.products.reduce((total, item) => {
-      return total + (item.product.price * item.quantity);
+      const price = typeof item.product.price === 'number' ? item.product.price : 0;
+      return total + (price * item.quantity);
     }, 0);
   };
 
@@ -88,7 +90,7 @@ const CartPage = () => {
                   <div key={item.product.id} className="cart-item">
                     <div className="product-info">
                       <h3>{item.product.name}</h3>
-                      <p>${item.product.price.toFixed(2)} each</p>
+                      <p>${typeof item.product.price === 'number' ? item.product.price.toFixed(2) : '0.00'} each</p>
                     </div>
                     <div className="quantity-controls">
                       <button
@@ -105,7 +107,7 @@ const CartPage = () => {
                       </button>
                     </div>
                     <div className="item-subtotal">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      ${(typeof item.product.price === 'number' ? item.product.price * item.quantity : 0).toFixed(2)}
                     </div>
                     <button
                       onClick={() => removeItem(item.product.id)}

@@ -4,33 +4,38 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
   
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password, role = 'buyer' } = req.body;
+  const { name, email, password, role = 'buyer', phone = '', dob = '', gender = 'prefer-not-to-say', profilePictureUrl = '' } = req.body;
 
-  // Check if user already exists
+  if (!name || !email || !password) {
+    res.status(400);
+    throw new Error('Name, email and password are required');
+  }
+
   const snapshot = await usersCol.where('email', '==', email).get();
   if (!snapshot.empty) {
     res.status(400);
     throw new Error('User with this email already exists');
   }
 
-  // Hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Create user document
   const userRef = await usersCol.add({
     name,
     email,
     password: hashedPassword,
     role,
-    createdAt: new Date().toISOString()
+    phone,
+    dob,
+    gender,
+    profilePictureUrl,
+    createdAt: new Date().toISOString(),
+    hasChangedName: false
   });
 
-  // Get the created user data
   const userDoc = await userRef.get();
   const user = { id: userDoc.id, ...userDoc.data() };
 
-  // Set session
   req.session.user = {
     id: user.id,
     name: user.name,
