@@ -46,6 +46,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
 
+
 // Error handler
 app.use(errorHandler);
 

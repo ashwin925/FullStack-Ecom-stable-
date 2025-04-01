@@ -8,6 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
     checkUserLoggedIn();
   }, []);
 
@@ -15,12 +19,19 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await axios.get('/api/auth/me', { withCredentials: true });
       setUser(data);
+      localStorage.setItem('user', JSON.stringify(data));
     } catch (error) {
       console.error('Auth check failed:', error.message);
       setUser(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateLocalProfile = (updatedData) => {
+    const updatedUser = { ...user, ...updatedData };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
   const login = async (formData) => {
@@ -63,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateLocalProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -1,29 +1,27 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../api/axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
     
     if (!email) {
-      setError('Email is required');
+      toast.error('Email is required');
       return;
     }
 
     setIsLoading(true);
     try {
       await axios.post('/api/auth/forgot-password', { email });
-      setMessage('If an account exists with this email, we\'ve sent a password reset link');
+      toast.success('If an account exists with this email, we\'ve sent a password reset link');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send reset link');
+      toast.error(err.response?.data?.message || 'Failed to send reset link');
     } finally {
       setIsLoading(false);
     }
@@ -31,9 +29,8 @@ const ForgotPassword = () => {
 
   return (
     <div className="forgot-password-container">
+      <ToastContainer />
       <h2>Forgot Password</h2>
-      {error && <div className="error-message">{error}</div>}
-      {message && <div className="success-message">{message}</div>}
       
       <form onSubmit={handleSubmit}>
         <input
