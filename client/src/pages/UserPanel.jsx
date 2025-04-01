@@ -1,33 +1,58 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ProductFilters from './ProductFilters';
 
 const UserPanel = () => {
   const { user, updateLocalProfile } = useAuth();
   const [products, setProducts] = useState([]);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
     dob: user?.dob || '',
     gender: user?.gender || 'prefer-not-to-say'
   });
+  const [searchParams] = useSearchParams();
 
-  // Load products
+  // Load products with filters
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const { data } = await axios.get('/api/products', { withCredentials: true });
+        const params = {
+          search: searchParams.get('search') || '',
+          minPrice: searchParams.get('minPrice') || '',
+          maxPrice: searchParams.get('maxPrice') || '',
+          category: searchParams.get('category') || ''
+        };
+    
+        setSearchQuery(params.search);
+        
+        // Clean params object (remove empty values)
+        const cleanParams = {};
+        for (const [paramKey, paramValue] of Object.entries(params)) {
+          if (paramValue !== '') {
+            cleanParams[paramKey] = paramValue;
+          }
+        }
+    
+        const { data } = await axios.get('/api/products', { params: cleanParams });
         setProducts(data);
-      } catch(err) {
+      } catch (err) {
         toast.error('Failed to load products');
         console.error('Fetch products error:', err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
-  }, []);
+  }, [searchParams]);
 
   // Initialize profile data when user changes
   useEffect(() => {
@@ -60,6 +85,10 @@ const UserPanel = () => {
     updateLocalProfile(profileData);
     setEditMode(false);
     toast.success('Profile updated!');
+  };
+
+  const clearFilters = () => {
+    window.location.search = '';
   };
 
   return (
@@ -152,7 +181,11 @@ const UserPanel = () => {
 
       <div className="products-section">
         <h2>Available Products</h2>
-        {products.length > 0 ? (
+        <ProductFilters />
+        
+        {loading ? (
+          <p className="loading-message">Loading products...</p>
+        ) : products.length > 0 ? (
           <div className="product-grid">
             {products.map(product => (
               <div key={product.id} className="product-card">
@@ -171,7 +204,19 @@ const UserPanel = () => {
             ))}
           </div>
         ) : (
-          <p>No products available.</p>
+          <div className="no-products-message">
+            {searchQuery ? (
+              <p>Sorry, no products found for "<strong>{searchQuery}</strong>"</p>
+            ) : (
+              <p>No products available matching your filters</p>
+            )}
+            <button 
+              onClick={clearFilters}
+              className="clear-filters-btn"
+            >
+              Clear All Filters
+            </button>
+          </div>
         )}
       </div>
     </div>

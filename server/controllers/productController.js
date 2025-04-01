@@ -2,21 +2,40 @@ import asyncHandler from 'express-async-handler';
 import { productsCol, cartsCol, db, FieldValue } from '../config/firebaseDB.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
-  const snapshot = await productsCol.get();
+  const { search, minPrice, maxPrice, category } = req.query;
+  let query = productsCol;
+
+  // Search by product name (case insensitive)
+  if (search) {
+    query = query.where('nameLowercase', '>=', search.toLowerCase())
+                 .where('nameLowercase', '<=', search.toLowerCase() + '\uf8ff');
+  }
+
+  // Price range filter
+  if (minPrice) query = query.where('price', '>=', Number(minPrice));
+  if (maxPrice) query = query.where('price', '<=', Number(maxPrice));
+
+  // Category filter
+  if (category) query = query.where('category', '==', category);
+
+  const snapshot = await query.get();
   const products = snapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
   }));
+  
   res.json(products);
 });
 
 export const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description } = req.body;
+  const { name, price, description, category } = req.body;
 
   const product = {
     name,
+    nameLowercase: name.toLowerCase(), // Add this line
     price: Number(price),
     description,
+    category: category || 'uncategorized',
     seller: req.user.id,
     createdAt: FieldValue.serverTimestamp()
   };
