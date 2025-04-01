@@ -223,4 +223,4 @@ const UserPanel = () => {
   );
 };
 
-export default UserPanel;
+export default UserPanel; // correct export
