@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProductFilters from './ProductFilters';
+import "./userPanel.css";
 
 const UserPanel = () => {
   const { user, updateLocalProfile } = useAuth();
@@ -89,6 +90,15 @@ const UserPanel = () => {
 
   const clearFilters = () => {
     window.location.search = '';
+  };
+
+  const handleOrderNow = async (productId) => {
+    try {
+      await axios.post('/api/orders', { productId }, { withCredentials: true });
+      toast.success('Order initiated!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to create order');
+    }
   };
 
   return (
@@ -199,6 +209,12 @@ const UserPanel = () => {
                   className="add-to-cart-btn"
                 >
                   Add to Cart
+                </button>
+                <button 
+                onClick={() => handleOrderNow(product.id)}
+                className="order-now-btn"
+                 >
+                 Order Now
                 </button>
               </div>
             ))}

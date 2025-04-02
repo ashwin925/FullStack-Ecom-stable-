@@ -1,3 +1,4 @@
+// firebaseDB.js
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { createRequire } from 'module';
@@ -17,6 +18,7 @@ db.settings({ ignoreUndefinedProperties: true });
 const usersCol = db.collection('users');
 const productsCol = db.collection('products');
 const cartsCol = db.collection('carts');
+const ordersCol = db.collection('orders'); // Added orders collection
 
 // Export FieldValue separately
-export { db, usersCol, productsCol, cartsCol, FieldValue };
+export { db, usersCol, productsCol, cartsCol, ordersCol, FieldValue };

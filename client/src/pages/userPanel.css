@@ -25,3 +25,23 @@
 .success {
   color: green;
 }
+/* Add to your CSS file */
+.product-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.order-now-btn {
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.order-now-btn:hover {
+  background-color: #e05d00;
+}
