@@ -14,6 +14,7 @@ export default function Header() {
             {user.role === 'admin' && <Link to="/admin">Admin</Link>}
             {user.role === 'seller' && <Link to="/seller">Seller</Link>}
             {user.role === 'buyer' && <Link to="/cart">Cart</Link>}
+            {user.role === 'buyer' && <Link to="/orders"> Order History</Link>}
           </>
         ) : (
           <>

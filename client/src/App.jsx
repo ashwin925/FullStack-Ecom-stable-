@@ -14,6 +14,7 @@ import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 function ErrorFallback({ error }) {
   return (
@@ -76,6 +77,7 @@ function App() {
             />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/orders" element={<OrderHistoryPage />} />
           </Routes>
         </AuthProvider>
       </Router>

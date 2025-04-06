@@ -1,0 +1,43 @@
+/* Order History Styles */
+.order-history {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.orders-container {
+  display: grid;
+  gap: 20px;
+}
+
+.order-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fff;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-products {
+  display: grid;
+  gap: 10px;
+}
+
+.product-item {
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}

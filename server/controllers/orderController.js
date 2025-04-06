@@ -29,3 +29,22 @@ export const createOrder = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Failed to create order' });
   }
 });
+
+// Add this to your existing orderController.js
+export const getOrders = asyncHandler(async (req, res) => {
+  try {
+    const snapshot = await ordersCol
+      .where('userId', '==', req.user.id)
+      .orderBy('createdAt', 'desc')
+      .get();
+      
+    const orders = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching orders' });
+  }
+});
