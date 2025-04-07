@@ -1,13 +1,14 @@
 import asyncHandler from 'express-async-handler';
 
 export const protect = asyncHandler(async (req, res, next) => {
-  if (req.session.user) {
-    req.user = req.session.user;
-    next();
-  } else {
-    res.status(401);
-    throw new Error('Not authorized, no session');
+  // Check if user is logged in (session exists)
+  if (req.session && req.session.user) {
+    req.user = req.session.user; // Attach user to request
+    return next();
   }
+  
+  res.status(401);
+  throw new Error('Not authorized, please login');
 });
 
 export const admin = (req, res, next) => {

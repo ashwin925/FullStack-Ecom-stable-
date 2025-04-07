@@ -1,4 +1,3 @@
-// controllers/orderController.js
 import asyncHandler from 'express-async-handler';
 import { ordersCol, productsCol, FieldValue } from '../config/firebaseDB.js';
 
@@ -11,26 +10,31 @@ export const createOrder = asyncHandler(async (req, res) => {
     if (!productDoc.exists) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    const product = productDoc.data();
 
-    // Create new order (single product)
-    const newOrderRef = await ordersCol.add({
+    // Create order (no additional auth checks)
+    const orderRef = await ordersCol.add({
       userId: req.user.id,
-      products: [{ productId, quantity: 1 }],
-      status: 'pending',
+      products: [{
+        productId,
+        name: product.name,
+        price: product.price,
+        quantity: 1
+      }],
+      status: 'completed',
       createdAt: FieldValue.serverTimestamp()
     });
 
-    res.status(201).json({
-      id: newOrderRef.id,
-      message: 'Order created successfully'
+    res.status(201).json({ 
+      success: true,
+      orderId: orderRef.id 
     });
   } catch (error) {
-    console.error('Create order error:', error);
-    res.status(500).json({ message: 'Failed to create order' });
+    console.error('Order error:', error);
+    res.status(500).json({ message: 'Order failed' });
   }
 });
 
-// Add this to your existing orderController.js
 export const getOrders = asyncHandler(async (req, res) => {
   try {
     const snapshot = await ordersCol
@@ -38,13 +42,18 @@ export const getOrders = asyncHandler(async (req, res) => {
       .orderBy('createdAt', 'desc')
       .get();
       
-    const orders = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const orders = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate()?.toISOString() || new Date().toISOString()
+      };
+    });
     
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching orders' });
+    console.error('Get orders error:', error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 });

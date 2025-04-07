@@ -20,15 +20,22 @@ const app = express();
 // Session configuration
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.JWT_SECRET || 'your-secret-key',
+  secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
   }
 }));
+
+app.use((req, res, next) => {
+  if (req.session.user) {
+    req.user = req.session.user;
+  }
+  next();
+});
 
 // CORS configuration
 app.use(cors({

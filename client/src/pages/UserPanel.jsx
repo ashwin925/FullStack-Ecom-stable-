@@ -69,9 +69,10 @@ const UserPanel = () => {
 
   const addToCart = async (productId) => {
     try {
-      await axios.post('/api/cart', { productId, quantity: 1 }, { withCredentials: true });
-      toast.success('Product added to cart!');
+      await axios.post('/api/cart', { productId, quantity: 1 });
+      toast.success('Added to cart!');
     } catch (error) {
+      console.error('Cart error:', error);
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
@@ -94,10 +95,11 @@ const UserPanel = () => {
 
   const handleOrderNow = async (productId) => {
     try {
-      await axios.post('/api/orders', { productId }, { withCredentials: true });
-      toast.success('Order initiated!');
+      const { data } = await axios.post('/api/orders', { productId });
+      toast.success(`Order #${data.orderId.slice(0, 6)} placed!`);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create order');
+      console.error('Order error:', error);
+      toast.error(error.response?.data?.message || 'Failed to place order');
     }
   };
 

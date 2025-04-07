@@ -65,37 +65,26 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('Login attempt for:', email);
-
   const snapshot = await usersCol.where('email', '==', email).limit(1).get();
   
   if (snapshot.empty) {
-    console.log('User not found');
-    res.status(401).json({ message: 'Invalid email or password' });
-    return;
+    return res.status(401).json({ message: 'Invalid email or password' });
   }
 
   const userDoc = snapshot.docs[0];
   const user = { id: userDoc.id, ...userDoc.data() };
 
-  console.log('Found user:', user.email);
-
   const isMatch = await bcrypt.compare(password, user.password);
-  console.log('Password match:', isMatch);
-
   if (!isMatch) {
-    res.status(401).json({ message: 'Invalid email or password' });
-    return;
+    return res.status(401).json({ message: 'Invalid email or password' });
   }
 
   req.session.user = {
     id: user.id,
-    name: user.name,
     email: user.email,
-    role: user.role
+    name: user.name,
+    role: user.role || 'buyer'
   };
-
-  console.log('Session set:', req.session.user);
 
   res.json({
     id: user.id,
