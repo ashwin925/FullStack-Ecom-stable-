@@ -1,5 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { cartsCol, productsCol, FieldValue } from '../config/firebaseDB.js';
+import { sendEmail } from '../config/email.js';
+
 
 export const getCart = asyncHandler(async (req, res) => {
   try {
@@ -57,6 +59,7 @@ export const addToCart = asyncHandler(async (req, res) => {
     if (!productDoc.exists) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    const product = productDoc.data();
 
     // Find or create cart
     const cartSnapshot = await cartsCol.where('userId', '==', req.user.id).limit(1).get();
@@ -94,6 +97,14 @@ export const addToCart = asyncHandler(async (req, res) => {
           updatedAt: FieldValue.serverTimestamp()
         });
       }
+    }
+
+    if (req.user.email) {
+      sendEmail(
+        req.user.email,
+        '🛒 Item Added to Cart',
+        `Hello ${req.user.name},\n\n"${product.name}" was added to your cart.\n\nView your cart: ${process.env.FRONTEND_URL}/cart`
+      ).catch(err => console.error('Email failed (non-critical):', err));
     }
 
     // Return success response without full cart data

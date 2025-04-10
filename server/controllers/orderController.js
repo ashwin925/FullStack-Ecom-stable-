@@ -1,5 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { ordersCol, productsCol, FieldValue } from '../config/firebaseDB.js';
+import { sendEmail } from '../config/email.js';
+
 
 export const createOrder = asyncHandler(async (req, res) => {
   try {
@@ -24,6 +26,14 @@ export const createOrder = asyncHandler(async (req, res) => {
       status: 'completed',
       createdAt: FieldValue.serverTimestamp()
     });
+
+    if (req.user.email) {
+      sendEmail(
+        req.user.email,
+        '🎉 Order Confirmed',
+        `Hello ${req.user.name},\n\nYour order for "${product.name}" ($${product.price}) was successful!\nOrder ID: ${orderRef.id.slice(0, 8)}`
+      ).catch(err => console.error('Email failed (non-critical):', err));
+    }
 
     res.status(201).json({ 
       success: true,
