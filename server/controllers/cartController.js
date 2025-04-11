@@ -99,12 +99,17 @@ export const addToCart = asyncHandler(async (req, res) => {
       }
     }
 
-    if (req.user.email) {
-      sendEmail(
+    if (req.user?.email) {
+      console.log(`Preparing cart email for: ${req.user.email}`);
+      
+      await sendEmail(
         req.user.email,
-        '🛒 Item Added to Cart',
-        `Hello ${req.user.name},\n\n"${product.name}" was added to your cart.\n\nView your cart: ${process.env.FRONTEND_URL}/cart`
-      ).catch(err => console.error('Email failed (non-critical):', err));
+        `🛒 Added to Cart: ${product.name}`,
+        `Hello ${req.user.name},\n\n` +
+        `You added "${product.name}" ($${product.price}) to your cart.\n\n` +
+        `View your cart: ${process.env.FRONTEND_URL}/cart\n\n` +
+        `Thank you for shopping with us!`
+      ).catch(err => console.error('Non-blocking email error:', err));
     }
 
     // Return success response without full cart data

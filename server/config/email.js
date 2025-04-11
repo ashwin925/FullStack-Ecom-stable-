@@ -1,24 +1,61 @@
 import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
+import dotenv from 'dotenv';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
+dotenv.config();
+
+// Debug: Verify all credentials
+console.log('Loaded OAuth Credentials:', {
+  clientId: process.env.GMAIL_OAUTH_CLIENT_ID ? '✅' : '❌',
+  clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET ? '✅' : '❌',
+  refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN ? '✅' : '❌',
+  emailUser: process.env.EMAIL_USER ? '✅' : '❌'
 });
+
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.GMAIL_OAUTH_CLIENT_ID,
+  process.env.GMAIL_OAUTH_CLIENT_SECRET,
+  'https://developers.google.com/oauthplayground'
+);
 
 export const sendEmail = async (to, subject, text) => {
   try {
-    await transporter.sendMail({
-      from: `"Your Store" <${process.env.EMAIL_USER}>`,
+    // Set credentials and get new access token
+    oAuth2Client.setCredentials({
+      refresh_token: process.env.GMAIL_OAUTH_REFRESH_TOKEN
+    });
+    
+    const { token: accessToken } = await oAuth2Client.getAccessToken();
+    console.log('Access token generated successfully');
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: process.env.EMAIL_USER,
+        clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+        clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
+        accessToken
+      }
+    });
+
+    const info = await transporter.sendMail({
+      from: `"E-Commerce Store" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text,
-      html: `<div style="font-family: Arial; padding: 20px;">${text.replace(/\n/g, '<br>')}</div>`
+      html: `<div>${text.replace(/\n/g, '<br>')}</div>`
     });
+
+    console.log('Email delivered to:', info.accepted);
+    return true;
   } catch (error) {
-    console.error('Email error (non-critical):', error.message);
-    // Silently fail - don't throw to avoid breaking main functionality
+    console.error('EMAIL FAILURE DETAILS:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
+    return false;
   }
 };

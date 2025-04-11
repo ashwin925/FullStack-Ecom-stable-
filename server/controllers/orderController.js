@@ -27,12 +27,18 @@ export const createOrder = asyncHandler(async (req, res) => {
       createdAt: FieldValue.serverTimestamp()
     });
 
-    if (req.user.email) {
-      sendEmail(
+    if (req.user?.email) {
+      console.log(`Preparing order email for: ${req.user.email}`);
+      
+      await sendEmail(
         req.user.email,
-        '🎉 Order Confirmed',
-        `Hello ${req.user.name},\n\nYour order for "${product.name}" ($${product.price}) was successful!\nOrder ID: ${orderRef.id.slice(0, 8)}`
-      ).catch(err => console.error('Email failed (non-critical):', err));
+        `🎉 Order Confirmed: ${product.name}`,
+        `Hello ${req.user.name},\n\n` +
+        `Your order for "${product.name}" ($${product.price}) is confirmed!\n\n` +
+        `Order ID: ${orderRef.id.slice(0, 8)}\n` +
+        `Status: Processing\n\n` +
+        `We'll notify you when it ships.`
+      ).catch(err => console.error('Non-blocking email error:', err));
     }
 
     res.status(201).json({ 
