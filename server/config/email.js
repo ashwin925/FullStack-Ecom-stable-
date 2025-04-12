@@ -1,61 +1,62 @@
-import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
+// Load environment variables FIRST
 dotenv.config();
 
-// Debug: Verify all credentials
-console.log('Loaded OAuth Credentials:', {
-  clientId: process.env.GMAIL_OAUTH_CLIENT_ID ? '✅' : '❌',
-  clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET ? '✅' : '❌',
-  refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN ? '✅' : '❌',
-  emailUser: process.env.EMAIL_USER ? '✅' : '❌'
+// Debug: Verify env vars are loaded
+console.log('Environment:', {
+  clientId: process.env.GMAIL_OAUTH_CLIENT_ID?.slice(0, 10) + '...',
+  refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN?.slice(0, 10) + '...',
+  emailUser: process.env.EMAIL_USER
 });
 
-const oAuth2Client = new google.auth.OAuth2(
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
   process.env.GMAIL_OAUTH_CLIENT_ID,
   process.env.GMAIL_OAUTH_CLIENT_SECRET,
-  'https://developers.google.com/oauthplayground'
+  "https://developers.google.com/oauthplayground"
 );
+
+oauth2Client.setCredentials({
+  refresh_token: process.env.GMAIL_OAUTH_REFRESH_TOKEN
+});
 
 export const sendEmail = async (to, subject, text) => {
   try {
-    // Set credentials and get new access token
-    oAuth2Client.setCredentials({
-      refresh_token: process.env.GMAIL_OAUTH_REFRESH_TOKEN
-    });
+    const { token } = await oauth2Client.getAccessToken();
     
-    const { token: accessToken } = await oAuth2Client.getAccessToken();
-    console.log('Access token generated successfully');
-
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // false for STARTTLS
+      requireTLS: true,
       auth: {
         type: 'OAuth2',
         user: process.env.EMAIL_USER,
         clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
         clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
         refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
-        accessToken
+        accessToken: token
+      },
+      tls: {
+        ciphers: 'SSLv3',
+        rejectUnauthorized: false
       }
     });
 
-    const info = await transporter.sendMail({
-      from: `"E-Commerce Store" <${process.env.EMAIL_USER}>`,
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
       to,
       subject,
-      text,
-      html: `<div>${text.replace(/\n/g, '<br>')}</div>`
+      text
     });
-
-    console.log('Email delivered to:', info.accepted);
+    
     return true;
-  } catch (error) {
-    console.error('EMAIL FAILURE DETAILS:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack
-    });
+  } catch (err) {
+    console.error('FULL ERROR:', err);
     return false;
   }
 };
