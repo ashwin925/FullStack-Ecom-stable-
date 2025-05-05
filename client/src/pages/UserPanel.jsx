@@ -1,3 +1,4 @@
+// client/src/pages/UserPanel.jsx
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
@@ -5,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProductFilters from './ProductFilters';
+import { sendUserEmail } from '../services/emailService';
 import "./userPanel.css";
 
 const UserPanel = () => {
@@ -71,11 +73,17 @@ const UserPanel = () => {
     try {
       await axios.post('/api/cart', { productId, quantity: 1 });
       toast.success('Added to cart!');
+      
+      // Send email to logged-in user
+      if (user?.email) {
+        await sendUserEmail(user.email, user.name, 'add_to_cart');
+      }
     } catch (error) {
       console.error('Cart error:', error);
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -97,6 +105,11 @@ const UserPanel = () => {
     try {
       const { data } = await axios.post('/api/orders', { productId });
       toast.success(`Order #${data.orderId.slice(0, 6)} placed!`);
+      
+      // Send email to logged-in user
+      if (user?.email) {
+        await sendUserEmail(user.email, user.name, 'place_order');
+      }
     } catch (error) {
       console.error('Order error:', error);
       toast.error(error.response?.data?.message || 'Failed to place order');

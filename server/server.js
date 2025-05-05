@@ -1,9 +1,10 @@
+// server/server.js
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import './config/firebaseDB.js'; // Initialize Firebase
+import './config/firebaseDB.js'; 
 
 // Routes
 import authRoutes from './routes/auth.js';

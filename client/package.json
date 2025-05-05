@@ -11,6 +11,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@emailjs/browser": "^4.4.1",
         "@stripe/stripe-js": "^5.10.0",
         "axios": "^1.8.2",
         "jwt-decode": "^4.0.0",
