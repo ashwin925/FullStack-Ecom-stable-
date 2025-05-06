@@ -115,6 +115,7 @@ const UserPanel = () => {
       toast.error(error.response?.data?.message || 'Failed to place order');
     }
   };
+  
 
   return (
     <div className="user-panel">

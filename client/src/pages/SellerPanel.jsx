@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
+import SellerAnalytics from '../components/SellerAnalytics';
 import 'react-toastify/dist/ReactToastify.css';
 
 const SellerPanel = () => {
