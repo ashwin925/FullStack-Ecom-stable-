@@ -1,4 +1,4 @@
-// routes/order.js
+// server/routes/order.js
 import express from 'express';
 import { protect } from '../middleware/auth.js';
 import { createOrder, getOrders } from '../controllers/orderController.js';

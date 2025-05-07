@@ -45,3 +45,15 @@
 .order-now-btn:hover {
   background-color: #e05d00;
 }
+/* Add these styles */
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 8px 0;
+}
+
+.rating {
+  display: flex;
+  gap: 2px;
+}

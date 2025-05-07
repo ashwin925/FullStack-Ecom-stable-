@@ -1,3 +1,4 @@
+// client/src/pages/SellerPanel.jsx 
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';

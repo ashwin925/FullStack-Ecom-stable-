@@ -1,3 +1,4 @@
+// server/controllers/cartController.js
 import asyncHandler from 'express-async-handler';
 import { cartsCol, productsCol, FieldValue } from '../config/firebaseDB.js';
 import { sendEmail } from '../config/email.js';

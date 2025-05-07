@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProductFilters from './ProductFilters';
 import { sendUserEmail } from '../services/emailService';
+import Rating from '../components/Rating'; 
 import "./userPanel.css";
 
 const UserPanel = () => {
@@ -220,6 +221,10 @@ const UserPanel = () => {
                   ${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}
                 </p>
                 <p className="description">{product.description}</p>
+                <div className="product-rating">
+                  <Rating rating={product.averageRating || 0} readOnly={true} />
+                  <span>({product.ratings?.length || 0} reviews)</span>
+                </div>
                 <button 
                   onClick={() => addToCart(product.id)}
                   className="add-to-cart-btn"

@@ -1,3 +1,4 @@
+// client/src/components/SellerAnalytics.jsx
 import React, { useState, useEffect } from 'react';
 import { Chart } from 'react-chartjs-2';
 import { 
@@ -11,7 +12,6 @@ import { io } from 'socket.io-client';
 import 'chartjs-adapter-date-fns';
 import './sellerAnalytics.css';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale, LinearScale, BarElement,
   PointElement, LineElement, ArcElement,
@@ -24,7 +24,6 @@ const SellerAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('week');
 
-  // Fetch orders data
   const fetchOrders = async () => {
     try {
       const { data } = await axios.get(`/api/orders/seller/${user.id}?range=${timeRange}`);
@@ -39,9 +38,7 @@ const SellerAnalytics = () => {
   useEffect(() => {
     fetchOrders();
 
-    // Set up WebSocket for real-time updates
     const socket = io('http://localhost:5000');
-    
     socket.on('order_created', (newOrder) => {
       if (newOrder.products.some(p => p.sellerId === user.id)) {
         setOrders(prev => [newOrder, ...prev]);
@@ -51,16 +48,15 @@ const SellerAnalytics = () => {
     return () => socket.disconnect();
   }, [user.id, timeRange]);
 
-  // Process data for charts
   const processChartData = () => {
     const productSales = {};
     const salesOverTime = {};
     const customerData = {};
+    const ratingDistribution = [0, 0, 0, 0, 0]; // For 1-5 stars
 
     orders.forEach(order => {
       const date = new Date(order.createdAt).toLocaleDateString();
       
-      // Track unique customers
       if (!customerData[order.buyer]) {
         customerData[order.buyer] = { count: 0, total: 0 };
       }
@@ -72,11 +68,22 @@ const SellerAnalytics = () => {
             productSales[product.productId] = {
               name: product.name,
               quantity: 0,
-              revenue: 0
+              revenue: 0,
+              ratings: []
             };
           }
           productSales[product.productId].quantity += product.quantity;
           productSales[product.productId].revenue += product.price * product.quantity;
+
+          // Collect ratings
+          if (product.ratings) {
+            product.ratings.forEach(rating => {
+              if (rating.rating >= 1 && rating.rating <= 5) {
+                ratingDistribution[rating.rating - 1]++;
+                productSales[product.productId].ratings.push(rating.rating);
+              }
+            });
+          }
 
           // Sales over time data
           if (!salesOverTime[date]) {
@@ -91,10 +98,10 @@ const SellerAnalytics = () => {
       });
     });
 
-    return { productSales, salesOverTime, customerData };
+    return { productSales, salesOverTime, customerData, ratingDistribution };
   };
 
-  const { productSales, salesOverTime, customerData } = processChartData();
+  const { productSales, salesOverTime, customerData, ratingDistribution } = processChartData();
 
   if (loading) return <div className="loading">Loading analytics...</div>;
 
@@ -159,28 +166,20 @@ const SellerAnalytics = () => {
         </div>
 
         <div className="chart-container">
-          <h3>Revenue by Product</h3>
+          <h3>Product Ratings</h3>
           <Chart
-            type="pie"
+            type="bar"
             data={{
-              labels: Object.values(productSales).map(p => p.name),
+              labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
               datasets: [{
-                label: 'Revenue ($)',
-                data: Object.values(productSales).map(p => p.revenue),
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.5)',
-                  'rgba(54, 162, 235, 0.5)',
-                  'rgba(255, 206, 86, 0.5)',
-                  'rgba(75, 192, 192, 0.5)',
-                  'rgba(153, 102, 255, 0.5)'
-                ]
+                label: 'Rating Count',
+                data: ratingDistribution,
+                backgroundColor: 'rgba(255, 206, 86, 0.7)'
               }]
             }}
             options={{
               responsive: true,
-              plugins: {
-                legend: { position: 'right' }
-              }
+              scales: { y: { beginAtZero: true } }
             }}
           />
         </div>

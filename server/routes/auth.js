@@ -10,7 +10,7 @@ router.get('/me', protect, getMe);
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
-router.post('/forgot-password', forgotPassword);  // ✅ Correct place for the route
+router.post('/forgot-password', forgotPassword); 
 router.post('/reset-password', resetPassword);
 
 // routes/auth.js (add this right before export)
