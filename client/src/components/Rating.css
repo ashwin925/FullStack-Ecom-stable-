@@ -2,14 +2,15 @@
 .rating {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .star {
   font-size: 1.5rem;
   color: #e2e8f0;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.2s ease;
+  position: relative;
 }
 
 .star.filled {
@@ -18,4 +19,16 @@
 
 .read-only .star {
   cursor: default;
+}
+
+/* Animation for the stars */
+.star {
+  transform-origin: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .star {
+    font-size: 1.2rem;
+  }
 }
