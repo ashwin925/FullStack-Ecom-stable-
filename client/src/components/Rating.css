@@ -1,0 +1,21 @@
+/* Rating.css */
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  font-size: 1.5rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star.filled {
+  color: #fbbf24;
+}
+
+.read-only .star {
+  cursor: default;
+}
