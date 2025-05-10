@@ -44,37 +44,37 @@
 /* App.css */
 .error-fallback {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
   background-color: #f8f9fa;
 }
 
-.error-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 90%;
-  text-align: center;
+.error-fallback h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
 }
 
 .error-message {
-  color: #dc3545;
-  background: #f8d7da;
+  background-color: #f8d7da;
+  color: #721c24;
   padding: 1rem;
   border-radius: 0.25rem;
-  margin: 1rem 0;
+  max-width: 800px;
+  width: 100%;
+  margin-bottom: 1.5rem;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-x: auto;
 }
 
 .retry-btn {
-  background: #4361ee;
+  padding: 0.75rem 1.5rem;
+  background-color: #4361ee;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
   border-radius: 0.25rem;
   font-size: 1rem;
   cursor: pointer;
@@ -82,30 +82,10 @@
 }
 
 .retry-btn:hover {
-  background: #3a56d4;
+  background-color: #3a56d4;
 }
 
-.not-found {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
-}
-
-.not-found h1 {
-  font-size: 3rem;
-  color: #343a40;
-  margin-bottom: 1rem;
-}
-
-.not-found p {
-  font-size: 1.25rem;
-  color: #6c757d;
-}
-
-/* Toast notifications customization */
+/* Toast notifications */
 .Toastify__toast {
   border-radius: 0.5rem !important;
   font-family: 'Inter', sans-serif !important;
@@ -125,4 +105,9 @@
 
 .Toastify__toast--info {
   background: #17a2b8 !important;
+}
+
+/* Animation base styles */
+.page-transition {
+  position: relative;
 }
