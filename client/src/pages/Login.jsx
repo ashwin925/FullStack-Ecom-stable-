@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import Header from '../components/Header';
 import './Login.css';
 
 const Login = () => {
@@ -44,7 +43,6 @@ const Login = () => {
 
   return (
     <div className="glass-login-page">
-      <Header />
       
       {/* Enhanced floating background elements */}
       <div className="glass-bg-elements">

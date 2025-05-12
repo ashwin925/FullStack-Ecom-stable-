@@ -112,6 +112,7 @@ const UserPanel = () => {
     >
       <ToastContainer />
       <motion.h1
+        style={{ marginTop: '20px' }}
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         className="panel-title"
