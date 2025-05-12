@@ -3,224 +3,55 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  padding: 2rem;
+  height: 495px;
+  width: 380px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 80%);
+  padding: 5px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 40px;
+  border-radius: 15px;
 }
 
 .register-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  padding: 3rem;
-  width: 100%;
-  max-width: 500px;
-}
-
-.register-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.register-header h2 {
-  font-size: 2rem;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-}
-
-.register-header p {
-  color: #718096;
-}
-
-.error-message {
-  background: #fff5f5;
-  color: #e53e3e;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-weight: 500;
-  color: #4a5568;
-}
-
-.form-group input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #818cf8;
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
-}
-
-.password-hint {
-  font-size: 0.8rem;
-  color: #a0aec0;
-  margin-top: 0.25rem;
-}
-
-.role-selector {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.role-btn {
-  flex: 1;
-  padding: 0.75rem;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.role-btn.active {
-  background: #818cf8;
-  color: white;
-}
-
-.register-btn {
-  padding: 1rem;
-  background: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.register-btn:hover {
-  background: #4338ca;
-}
-
-.register-btn:disabled {
-  background: #a5b4fc;
-  cursor: not-allowed;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.register-footer {
-  text-align: center;
-  margin-top: 2rem;
-  color: #718096;
-}
-
-.register-footer a {
-  color: #4f46e5;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.register-footer a:hover {
-  text-decoration: underline;
-}
-/* Register.css */
-.glass-register-page {
-  height: 100vh;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.holographic-bg-elements {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.holographic-circle {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-}
-
-.glass-register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 70px);
-  padding: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.glass-register-card {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   transform: translateZ(0);
 }
 
 .register-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .register-header h2 {
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+  color: #2d3748;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .register-header p {
-  color: #4a5568;
-  font-size: 0.95rem;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
 .error-message {
   background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
-  padding: 1rem;
+  padding: 0.8rem;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
   border: 1px solid rgba(239, 68, 68, 0.2);
   animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -229,27 +60,27 @@
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  margin-bottom: -10px;
+  margin-top: -10px;
+
 }
 
 .form-group label {
   font-weight: 600;
-  color: #2d3748;
-  font-size: 0.95rem;
+  color: #334155;
+  font-size: 0.9rem;
 }
 
 .form-group input {
-  padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(203, 213, 225, 0.6);
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #2d3748;
   transition: all 0.3s ease;
 }
@@ -257,27 +88,27 @@
 .form-group input:focus {
   outline: none;
   border-color: #4f46e5;
-  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .password-hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #94a3b8;
-  margin-top: 0.25rem;
 }
 
 .role-selector {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
 }
 
 .role-btn {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0.7rem;
   background: #f1f5f9;
   border: none;
   border-radius: 8px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -286,10 +117,11 @@
 .role-btn.active {
   background: #4f46e5;
   color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .register-btn {
-  padding: 1rem;
+  padding: 0.85rem;
   background: linear-gradient(90deg, #4f46e5, #7c3aed);
   color: white;
   border: none;
@@ -304,6 +136,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  margin-top: 0.5rem;
 }
 
 .register-btn::after {
@@ -316,11 +149,16 @@
   background: linear-gradient(
     to bottom right,
     rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0.2) 50%,
     rgba(255,255,255,0) 100%
   );
   transform: rotate(30deg);
   animation: shine 3s infinite;
+}
+
+.register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
 }
 
 .register-btn:disabled {
@@ -329,31 +167,32 @@
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 .register-footer {
   text-align: center;
-  margin-top: 1.5rem;
-  color: #4a5568;
-  font-size: 0.95rem;
+  margin-top: 1.2rem;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
-.footer-link {
+.register-footer a {
   color: #4f46e5;
   font-weight: 600;
   text-decoration: none;
   position: relative;
 }
 
-.footer-link::after {
+.register-footer a::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: -1px;
   left: 0;
   width: 0;
   height: 2px;
@@ -361,7 +200,7 @@
   transition: width 0.3s ease;
 }
 
-.footer-link:hover::after {
+.register-footer a:hover::after {
   width: 100%;
 }
 
@@ -382,9 +221,9 @@
 }
 
 @media (max-width: 480px) {
-  .glass-register-card {
-    padding: 1.5rem;
-    border-radius: 14px;
+  .register-card {
+    padding: 1.25rem;
+    max-width: 340px;
   }
   
   .register-header h2 {
