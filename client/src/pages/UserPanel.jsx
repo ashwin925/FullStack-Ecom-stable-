@@ -109,145 +109,212 @@ const UserPanel = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
     >
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+
+      {/* Enhanced welcome title with gradient animation */}
       <motion.h1
-        style={{ marginTop: '20px' }}
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
         className="panel-title"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        style={{
+          background: 'linear-gradient(90deg, #4f46e5, #7c3aed)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+          display: 'inline-block'
+        }}
       >
         Welcome, {user?.name}!
       </motion.h1>
 
       <div className="panel-content">
+        {/* Profile Section with enhanced animations */}
         <motion.div 
-          className="profile-section"
+          className="profile-section glass-card"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2, type: 'spring' }}
+          whileHover={{ 
+            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.2)',
+            transform: 'translateY(-3px)'
+          }}
         >
           <div className="section-header">
-            <h2>Your Profile</h2>
+            <motion.h2
+              animate={{
+                textShadow: [
+                  '0 0 8px rgba(102, 126, 234, 0.1)',
+                  '0 0 12px rgba(102, 126, 234, 0.2)',
+                  '0 0 8px rgba(102, 126, 234, 0.1)'
+                ]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatType: 'reverse'
+              }}
+            >
+              Your Profile
+            </motion.h2>
+            
             {!editMode && (
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  background: '#4f46e5',
+                  color: 'white'
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setEditMode(true)}
                 className="edit-btn"
+                style={{
+                  background: 'rgba(79, 70, 229, 0.1)',
+                  color: '#4f46e5'
+                }}
               >
                 Edit Profile
               </motion.button>
             )}
           </div>
 
-          {editMode ? (
-            <motion.form 
-              onSubmit={handleProfileSubmit}
-              className="profile-edit-form"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={profileData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Phone</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={profileData.phone}
-                  onChange={handleInputChange}
-                  placeholder="Optional"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Birthday</label>
-                <input
-                  type="date"
-                  name="dob"
-                  value={profileData.dob}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Gender</label>
-                <select
-                  name="gender"
-                  value={profileData.gender}
-                  onChange={handleInputChange}
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                </select>
-              </div>
-              
-              <div className="form-actions">
-                <motion.button 
-                  type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="save-btn"
-                >
-                  Save Changes
-                </motion.button>
-                <motion.button 
-                  type="button" 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setEditMode(false)}
-                  className="cancel-btn"
-                >
-                  Cancel
-                </motion.button>
-              </div>
-            </motion.form>
-          ) : (
-            <motion.div 
-              className="profile-display"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="profile-info">
-                <div className="profile-image">
-                  <img 
-                    src={user?.profilePictureUrl || '/default-profile.png'} 
-                    alt="Profile" 
-                  />
+          <AnimatePresence mode="wait">
+            {editMode ? (
+              <motion.form 
+                onSubmit={handleProfileSubmit}
+                className="profile-edit-form"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Form groups with enhanced focus effects */}
+                {['name', 'phone', 'dob', 'gender'].map((field, index) => (
+                  <motion.div
+                    key={field}
+                    className="form-group"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                  >
+                    <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                    {field === 'gender' ? (
+                      <select
+                        name={field}
+                        value={profileData[field]}
+                        onChange={handleInputChange}
+                        className="glass-input"
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                      </select>
+                    ) : (
+                      <input
+                        type={field === 'dob' ? 'date' : field === 'phone' ? 'tel' : 'text'}
+                        name={field}
+                        value={profileData[field]}
+                        onChange={handleInputChange}
+                        className="glass-input"
+                        required={field === 'name'}
+                        placeholder={field === 'phone' ? 'Optional' : ''}
+                      />
+                    )}
+                  </motion.div>
+                ))}
+
+                <div className="form-actions">
+                  <motion.button 
+                    type="submit"
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: '0 5px 15px rgba(79, 70, 229, 0.4)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className="save-btn"
+                    style={{
+                      background: 'linear-gradient(90deg, #4f46e5, #7c3aed)'
+                    }}
+                  >
+                    Save Changes
+                  </motion.button>
+                  <motion.button 
+                    type="button" 
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setEditMode(false)}
+                    className="cancel-btn"
+                  >
+                    Cancel
+                  </motion.button>
                 </div>
-                <div className="profile-details">
-                  <h3>{user?.name}</h3>
-                  <p><span>Email:</span> {user?.email}</p>
-                  {user?.phone && <p><span>Phone:</span> {user.phone}</p>}
-                  {user?.dob && <p><span>Birthday:</span> {new Date(user.dob).toLocaleDateString()}</p>}
-                  <p><span>Gender:</span> {user?.gender || 'Not specified'}</p>
-                  <p><span>Account Type:</span> {user?.role}</p>
+              </motion.form>
+            ) : (
+              <motion.div 
+                className="profile-display"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="profile-info">
+                  <motion.div 
+                    className="profile-image"
+                    whileHover={{ rotate: 5 }}
+                    transition={{ type: 'spring' }}
+                  >
+                    <img 
+                      src={user?.profilePictureUrl || '/default-profile.png'} 
+                      alt="Profile" 
+                    />
+                  </motion.div>
+                  <div className="profile-details">
+                    <h3>{user?.name}</h3>
+                    {['email', 'phone', 'dob', 'gender', 'role'].map((field) => (
+                      user?.[field] && (
+                        <p key={field}>
+                          <span>{field.charAt(0).toUpperCase() + field.slice(1)}:</span> {
+                            field === 'dob' ? 
+                            new Date(user.dob).toLocaleDateString() : 
+                            field === 'gender' ? 
+                            user.gender === 'prefer-not-to-say' ? 'Prefer not to say' : user.gender :
+                            user[field]
+                          }
+                        </p>
+                      )
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
+        {/* Products Section with enhanced animations */}
         <motion.div 
-          className="products-section"
+          className="products-section glass-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3, type: 'spring' }}
+          whileHover={{ 
+            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.2)'
+          }}
         >
           <div className="section-header">
             <h2>Available Products</h2>
@@ -255,30 +322,56 @@ const UserPanel = () => {
           </div>
 
           {loading ? (
-            <div className="loading-products">
-              <div className="spinner"></div>
+            <motion.div 
+              className="loading-products"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <motion.div
+                className="spinner"
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                style={{
+                  width: 50,
+                  height: 50,
+                  border: '5px solid #e2e8f0',
+                  borderTopColor: '#4f46e5',
+                  borderRadius: '50%'
+                }}
+              />
               <p>Loading products...</p>
-            </div>
+            </motion.div>
           ) : products.length > 0 ? (
             <div className="products-grid">
               <AnimatePresence>
-                {products.map(product => (
+                {products.map((product, index) => (
                   <motion.div
                     key={product.id}
-                    className="product-card"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                    whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+                    className="product-card glass-card"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      delay: 0.1 * (index % 3),
+                      type: 'spring',
+                      stiffness: 300
+                    }}
+                    whileHover={{ 
+                      y: -10,
+                      boxShadow: '0 15px 30px rgba(102, 126, 234, 0.2)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
                     layout
                   >
-                    <div className="product-image">
+                    <motion.div 
+                      className="product-image"
+                      whileHover={{ scale: 1.03 }}
+                    >
                       <img 
                         src={product.image || '/placeholder-product.jpg'} 
                         alt={product.name}
                       />
-                    </div>
+                    </motion.div>
                     <div className="product-info">
                       <h3>{product.name}</h3>
                       <p className="price">${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}</p>
@@ -293,18 +386,32 @@ const UserPanel = () => {
                     </div>
                     <div className="product-actions">
                       <motion.button
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ 
+                          scale: 1.05,
+                          background: '#4f46e5',
+                          color: 'white'
+                        }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => addToCart(product.id)}
                         className="add-to-cart-btn"
+                        style={{
+                          background: 'rgba(79, 70, 229, 0.1)',
+                          color: '#4f46e5'
+                        }}
                       >
                         Add to Cart
                       </motion.button>
                       <motion.button
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ 
+                          scale: 1.05,
+                          boxShadow: '0 5px 15px rgba(79, 70, 229, 0.4)'
+                        }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleOrderNow(product.id)}
                         className="order-now-btn"
+                        style={{
+                          background: 'linear-gradient(90deg, #4f46e5, #7c3aed)'
+                        }}
                       >
                         Order Now
                       </motion.button>
@@ -316,21 +423,42 @@ const UserPanel = () => {
           ) : (
             <motion.div 
               className="no-products"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <div className="empty-icon">🔍</div>
+              <motion.div 
+                className="empty-icon"
+                animate={{ 
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  repeat: Infinity,
+                  duration: 2,
+                  ease: "easeInOut"
+                }}
+              >
+                🔍
+              </motion.div>
               {searchQuery ? (
                 <h3>No results for "<span>{searchQuery}</span>"</h3>
               ) : (
                 <h3>No products available</h3>
               )}
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  background: '#4f46e5',
+                  color: 'white'
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={clearFilters}
                 className="clear-filters-btn"
+                style={{
+                  background: 'rgba(79, 70, 229, 0.1)',
+                  color: '#4f46e5'
+                }}
               >
                 Clear All Filters
               </motion.button>
