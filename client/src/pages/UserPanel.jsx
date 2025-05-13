@@ -188,6 +188,7 @@ const UserPanel = () => {
             ease: 'easeInOut'
           }}
           style={{
+            marginTop: '20px',
             background: 'linear-gradient(90deg, #4f46e5, #7c3aed, #4f46e5)',
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
@@ -204,7 +205,6 @@ const UserPanel = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Explore and shop from our amazing collection
         </motion.p>
       </motion.div>
 
@@ -212,6 +212,7 @@ const UserPanel = () => {
         {/* Profile Section with enhanced animations */}
         <motion.div 
           className="profile-section glass-card"
+          style={{ height: '450px' }}
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ 
