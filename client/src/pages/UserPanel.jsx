@@ -124,33 +124,105 @@ const UserPanel = () => {
         theme="colored"
       />
 
-      {/* Enhanced welcome title with gradient animation */}
-      <motion.h1
-        className="panel-title"
-        initial={{ y: -20, opacity: 0 }}
+      {/* Enhanced page background with animated gradient */}
+      <motion.div 
+        className="page-background"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        <motion.div 
+          className="gradient-circle top-left"
+          animate={{
+            x: [-20, 0, -20],
+            y: [-10, 10, -10],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="gradient-circle bottom-right"
+          animate={{
+            x: [0, 20, 0],
+            y: [10, -10, 10],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+      </motion.div>
+
+      {/* Enhanced welcome title with floating animation */}
+      <motion.div
+        className="panel-header"
+        initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        style={{
-          background: 'linear-gradient(90deg, #4f46e5, #7c3aed)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-          display: 'inline-block'
+        transition={{ 
+          type: 'spring',
+          stiffness: 100,
+          damping: 10
         }}
       >
-        Welcome, {user?.name}!
-      </motion.h1>
+        <motion.h1
+          className="panel-title"
+          animate={{
+            backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+            textShadow: [
+              '0 2px 10px rgba(102, 126, 234, 0.2)',
+              '0 4px 20px rgba(102, 126, 234, 0.3)',
+              '0 2px 10px rgba(102, 126, 234, 0.2)'
+            ]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            ease: 'easeInOut'
+          }}
+          style={{
+            background: 'linear-gradient(90deg, #4f46e5, #7c3aed, #4f46e5)',
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+            display: 'inline-block'
+          }}
+        >
+          Welcome, {user?.name}!
+        </motion.h1>
+        <motion.p
+          className="panel-subtitle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          Explore and shop from our amazing collection
+        </motion.p>
+      </motion.div>
 
       <div className="panel-content">
         {/* Profile Section with enhanced animations */}
         <motion.div 
           className="profile-section glass-card"
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, type: 'spring' }}
+          transition={{ 
+            delay: 0.2, 
+            type: 'spring',
+            stiffness: 120,
+            damping: 15
+          }}
           whileHover={{ 
-            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.2)',
-            transform: 'translateY(-3px)'
+            boxShadow: '0 20px 40px rgba(102, 126, 234, 0.15)',
+            transform: 'translateY(-5px)'
           }}
         >
           <div className="section-header">
@@ -158,12 +230,12 @@ const UserPanel = () => {
               animate={{
                 textShadow: [
                   '0 0 8px rgba(102, 126, 234, 0.1)',
-                  '0 0 12px rgba(102, 126, 234, 0.2)',
+                  '0 0 15px rgba(102, 126, 234, 0.3)',
                   '0 0 8px rgba(102, 126, 234, 0.1)'
                 ]
               }}
               transition={{
-                duration: 3,
+                duration: 4,
                 repeat: Infinity,
                 repeatType: 'reverse'
               }}
@@ -199,16 +271,19 @@ const UserPanel = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, type: 'spring' }}
               >
-                {/* Form groups with enhanced focus effects */}
                 {['name', 'phone', 'dob', 'gender'].map((field, index) => (
                   <motion.div
                     key={field}
                     className="form-group"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index }}
+                    transition={{ 
+                      delay: 0.1 * index,
+                      type: 'spring',
+                      stiffness: 200
+                    }}
                   >
                     <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                     {field === 'gender' ? (
@@ -241,7 +316,7 @@ const UserPanel = () => {
                     type="submit"
                     whileHover={{ 
                       scale: 1.05,
-                      boxShadow: '0 5px 15px rgba(79, 70, 229, 0.4)'
+                      boxShadow: '0 5px 20px rgba(79, 70, 229, 0.4)'
                     }}
                     whileTap={{ scale: 0.98 }}
                     className="save-btn"
@@ -276,8 +351,15 @@ const UserPanel = () => {
                 <div className="profile-info">
                   <motion.div 
                     className="profile-image"
-                    whileHover={{ rotate: 5 }}
-                    transition={{ type: 'spring' }}
+                    whileHover={{ 
+                      rotate: [0, 5, -5, 0],
+                      scale: [1, 1.05, 1]
+                    }}
+                    transition={{ 
+                      duration: 1,
+                      repeat: Infinity,
+                      repeatType: 'reverse'
+                    }}
                   >
                     <img 
                       src={user?.profilePictureUrl || '/default-profile.png'} 
@@ -309,15 +391,35 @@ const UserPanel = () => {
         {/* Products Section with enhanced animations */}
         <motion.div 
           className="products-section glass-card"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, type: 'spring' }}
+          transition={{ 
+            delay: 0.3, 
+            type: 'spring',
+            stiffness: 100,
+            damping: 15
+          }}
           whileHover={{ 
-            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.2)'
+            boxShadow: '0 20px 40px rgba(102, 126, 234, 0.15)'
           }}
         >
           <div className="section-header">
-            <h2>Available Products</h2>
+            <motion.h2
+              animate={{
+                textShadow: [
+                  '0 0 8px rgba(102, 126, 234, 0.1)',
+                  '0 0 15px rgba(102, 126, 234, 0.3)',
+                  '0 0 8px rgba(102, 126, 234, 0.1)'
+                ]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                repeatType: 'reverse'
+              }}
+            >
+              Available Products
+            </motion.h2>
             <ProductFilters />
           </div>
 
@@ -337,10 +439,21 @@ const UserPanel = () => {
                   height: 50,
                   border: '5px solid #e2e8f0',
                   borderTopColor: '#4f46e5',
+                  borderRightColor: '#4f46e5',
                   borderRadius: '50%'
                 }}
               />
-              <p>Loading products...</p>
+              <motion.p
+                animate={{
+                  opacity: [0.6, 1, 0.6]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity
+                }}
+              >
+                Loading products...
+              </motion.p>
             </motion.div>
           ) : products.length > 0 ? (
             <div className="products-grid">
@@ -350,15 +463,18 @@ const UserPanel = () => {
                     key={product.id}
                     className="product-card glass-card"
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ 
-                      delay: 0.1 * (index % 3),
-                      type: 'spring',
-                      stiffness: 300
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0,
+                      transition: { 
+                        delay: 0.05 * (index % 4),
+                        type: 'spring',
+                        stiffness: 300
+                      }
                     }}
                     whileHover={{ 
                       y: -10,
-                      boxShadow: '0 15px 30px rgba(102, 126, 234, 0.2)'
+                      boxShadow: '0 20px 40px rgba(102, 126, 234, 0.2)'
                     }}
                     whileTap={{ scale: 0.98 }}
                     layout
@@ -404,7 +520,7 @@ const UserPanel = () => {
                       <motion.button
                         whileHover={{ 
                           scale: 1.05,
-                          boxShadow: '0 5px 15px rgba(79, 70, 229, 0.4)'
+                          boxShadow: '0 5px 20px rgba(79, 70, 229, 0.4)'
                         }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleOrderNow(product.id)}
@@ -424,8 +540,11 @@ const UserPanel = () => {
             <motion.div 
               className="no-products"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                transition: { type: 'spring' }
+              }}
             >
               <motion.div 
                 className="empty-icon"
